@@ -1,0 +1,20 @@
+package com.danny.chatroom.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.time.LocalDateTime;
+
+@Getter
+@Setter
+@AllArgsConstructor
+public class ChatMessageResponse {
+    private Long messageId;
+    private Long roomId;
+    private Long senderId;
+    private String senderName;
+    private String content;
+    private String messageType;
+    private LocalDateTime createdAt;
+}
