@@ -1,5 +1,5 @@
 {
-  "name": "chatroom-front-end",
+  "name": "shoppingplatform",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -7,31 +7,26 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "lint": "run-s lint:*",
-    "lint:oxlint": "oxlint . --fix",
-    "lint:eslint": "eslint . --fix --cache",
-    "format": "prettier --write --experimental-cli src/"
+    "lint": "eslint . --fix",
+    "format": "prettier --write src/"
   },
   "dependencies": {
+    "axios": "^1.9.0",
+    "bootstrap": "^5.3.6",
     "pinia": "^3.0.4",
-    "vue": "^3.5.32",
-    "vue-router": "^5.0.4"
+    "sweetalert2": "^11.22.0",
+    "vue": "^3.5.13",
+    "vue-router": "^4.5.0"
   },
   "devDependencies": {
-    "@eslint/js": "^10.0.1",
-    "@vitejs/plugin-vue": "^6.0.6",
-    "eslint": "^10.2.1",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-oxlint": "~1.60.0",
-    "eslint-plugin-vue": "~10.8.0",
-    "globals": "^17.5.0",
-    "npm-run-all2": "^8.0.4",
-    "oxlint": "~1.60.0",
-    "prettier": "3.8.3",
-    "vite": "^8.0.8",
-    "vite-plugin-vue-devtools": "^8.1.1"
-  },
-  "engines": {
-    "node": "^20.19.0 || >=22.12.0"
+    "@eslint/js": "^9.22.0",
+    "@vitejs/plugin-vue": "^5.2.3",
+    "@vue/eslint-config-prettier": "^10.2.0",
+    "eslint": "^9.22.0",
+    "eslint-plugin-vue": "~10.0.0",
+    "globals": "^16.0.0",
+    "prettier": "3.5.3",
+    "vite": "^6.2.4",
+    "vite-plugin-vue-devtools": "^7.7.2"
   }
 }
