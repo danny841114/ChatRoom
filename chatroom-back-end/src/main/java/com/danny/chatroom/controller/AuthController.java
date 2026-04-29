@@ -20,7 +20,7 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
         try {
-            Map<String, String> response = authService.login(loginRequest.getAccount(), loginRequest.getPassword());
+            Map<String, Object> response = authService.login(loginRequest.getAccount(), loginRequest.getPassword());
             return ResponseEntity.ok(response);
         }catch (Exception e){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());

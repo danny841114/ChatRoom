@@ -85,6 +85,7 @@ public class ChatService {
                 message.getChatRoom().getId(),
                 message.getSender().getId(),
                 message.getSender().getUsername(),
+                message.getSender().getAccount(),
                 message.getContent(),
                 message.getMessageType(),
                 message.getCreatedAt()

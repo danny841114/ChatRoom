@@ -15,7 +15,7 @@ public class AuthService {
     private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
 
-    public Map<String, String> login(String account, String password) {
+    public Map<String, Object> login(String account, String password) {
         User user = userRepository.findByAccount(account)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -25,9 +25,10 @@ public class AuthService {
 
         String token = jwtUtil.generateToken(account);
 
-        Map<String, String> response = new HashMap<>();
+        Map<String, Object> response = new HashMap<>();
         response.put("account", user.getAccount());
         response.put("username", user.getUsername());
+        response.put("userId", user.getId());
         response.put("token", token);
 
         return response;

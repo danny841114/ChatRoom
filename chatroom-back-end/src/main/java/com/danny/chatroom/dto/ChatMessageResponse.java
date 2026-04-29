@@ -14,6 +14,7 @@ public class ChatMessageResponse {
     private Long roomId;
     private Long senderId;
     private String senderName;
+    private String senderAccount;
     private String content;
     private String messageType;
     private LocalDateTime createdAt;
