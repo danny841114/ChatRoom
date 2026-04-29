@@ -39,6 +39,7 @@
   <script setup>
   import { ref } from "vue";
   import { useRouter } from "vue-router";
+  import { useAuthStore } from "@/stores/auth";
   import axios from "axios";
   import Swal from "sweetalert2";
 
@@ -48,6 +49,7 @@
   const password = ref("");
   const errorMsg = ref("");
   const router = useRouter();
+  const authStore = useAuthStore();
   
   const handleLogin = async () => {
     try {
@@ -55,10 +57,9 @@
         account: account.value,
         password: password.value,
       });
-      const token = response.data;
-      console.log(token);
-  
-      localStorage.setItem('jwt', token);  // 儲存 token
+      console.log("response.data",response.data)
+
+      authStore.setLogin(response.data);
   
       await Swal.fire({
         title: "登入成功",

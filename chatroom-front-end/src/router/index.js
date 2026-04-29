@@ -4,6 +4,7 @@ import AddProduct from "@/views/product/AddProduct.vue";
 import ManageProduct from "@/views/product/ManageProduct.vue";
 import ModifyProduct from "@/views/product/ModifyProduct.vue";
 import Login from "@/views/member/Login.vue";
+import ChatRoom from "@/views/member/ChatRoom.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -33,6 +34,11 @@ const router = createRouter({
       path: "/login",
       name: "Login",
       component: Login,
+    },
+    {
+      path: "/chat",
+      name: "ChatRoom",
+      component: ChatRoom,
     },
   ],
 });

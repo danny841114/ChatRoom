@@ -6,13 +6,16 @@ import com.danny.chatroom.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RequiredArgsConstructor
 @Service
 public class AuthService {
     private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
 
-    public String login(String account, String password) {
+    public Map<String, String> login(String account, String password) {
         User user = userRepository.findByAccount(account)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -20,6 +23,13 @@ public class AuthService {
             throw new RuntimeException("Password not match");
         }
 
-        return jwtUtil.generateToken(account);
+        String token = jwtUtil.generateToken(account);
+
+        Map<String, String> response = new HashMap<>();
+        response.put("account", user.getAccount());
+        response.put("username", user.getUsername());
+        response.put("token", token);
+
+        return response;
     }
 }

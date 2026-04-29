@@ -31,18 +31,19 @@
           <li class="nav-item">
             <router-link class="nav-link" to="/">首頁</router-link>
           </li>
-          <li class="nav-item" v-if="authStore.userId">
-            <router-link class="nav-link" to="/product/add"
-              >新增清單</router-link
+          <li class="nav-item" v-if="!authStore.account">
+            <router-link class="nav-link" to="/login">登入</router-link>
+          </li>
+          <li class="nav-item" v-if="authStore.account">
+            <span class="nav-link disabled">{{ authStore.username }}</span>
+          </li>
+          <li class="nav-item" v-if="authStore.account">
+            <router-link class="nav-link" to="/chat"
+              >聊天</router-link
             >
           </li>
-          <li class="nav-item" v-if="authStore.userId">
-            <router-link class="nav-link" to="/product/manage"
-              >查詢清單</router-link
-            >
-          </li>
-          <li class="nav-item" v-if="authStore.userId">
-            <a class="nav-link" @click="logout">登出</a>
+          <li class="nav-item" v-if="authStore.account">
+            <a class="nav-link" @click="logout" style="cursor: pointer">登出</a>
           </li>
         </ul>
       </div>
