@@ -12,7 +12,6 @@ import com.danny.chatroom.repository.ChatRoomRepository;
 import com.danny.chatroom.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -77,7 +76,7 @@ public class ChatService {
     private void checkRoomMember(Long roomId, Long userId) {
         boolean isMember = chatRoomMemberRepository.existsByChatRoomIdAndUserId(roomId, userId);
 
-        if (!isMember) throw new AccessDeniedException("不是聊天室成員，無法操作");
+        if (!isMember) throw new EntityNotFoundException("不是聊天室成員，無法操作");
     }
 
     private ChatMessageResponse toMessageResponse(ChatMessage message) {
