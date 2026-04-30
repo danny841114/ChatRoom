@@ -6,9 +6,9 @@
 
       <div
         v-for="room in chatRooms"
-        :key="room.id"
+        :key="room.roomId"
         class="room-item"
-        @click="selectRoom(room)"
+        @click="loadMessages(room.roomId)"
       >
         <div class="room-name">{{ room.name }}</div>
         <!-- <div class="room-type">
@@ -20,7 +20,7 @@
     <!-- 右側聊天室主體 -->
     <main class="chat-main">
       <div class="chat-header">
-        <!-- {{ selectedRoom?.name || "請選擇聊天室" }} -->
+        {{ chatRoomName }}
       </div>
 
       <div class="messages">
@@ -37,7 +37,7 @@
           placeholder="輸入訊息..."
           @keyup.enter="sendMessage"
         />
-        <button class="btn btn-primary" @click="sendMessage">送出</button>
+        <button class="btn btn-primary" @click="sendMessage(1)">送出</button>
       </div>
     </main>
   </div>
@@ -49,7 +49,8 @@ import { useAuthStore } from "@/stores/auth";
 import axios from "axios";
 
 const authStore = useAuthStore();
-const chatRooms = ref("");
+const chatRooms = ref([]);
+const chatRoomName = ref("");
 const message = ref("");
 const messages = ref([]);
 
@@ -69,8 +70,6 @@ const loadChatRooms = async () => {
       },
     );
 
-    console.log("chat rooms", response.data);
-
     chatRooms.value = response.data;
   } catch (e) {
     console.error("Error loading chat rooms", error);
@@ -80,13 +79,13 @@ const loadChatRooms = async () => {
 loadChatRooms();
 
 // 發送訊息到後端
-const sendMessage = () => {
+const sendMessage = (roomId) => {
   if (!message.value.trim()) return;
 
   // 構建訊息對象
   const msg = {
     content: message.value,
-    username: "User", // 這裡可以改為真實使用者名稱
+    senderId: authStore.userId, 
   };
 
   // 清空輸入框
@@ -94,7 +93,7 @@ const sendMessage = () => {
   // 透過 Axios 發送訊息
   axios
     .post(
-      "http://localhost:8080/api/chat", // 後端聊天室訊息 API
+      `http://localhost:8080/api/chat/rooms/${roomId}/messages`,
       msg,
       {
         headers: {
@@ -112,10 +111,10 @@ const sendMessage = () => {
 };
 
 // 載入歷史訊息
-const loadMessages = () => {
+const loadMessages = (chatRoomId) => {
   axios
     .get(
-      "http://localhost:8080/api/chat/rooms/1/messages",
+      `http://localhost:8080/api/chat/rooms/${chatRoomId}/messages`,
       { params: { userId: authStore.userId } },
       {
         headers: {
@@ -125,14 +124,15 @@ const loadMessages = () => {
     )
     .then((response) => {
       messages.value = response.data;
+      chatRoomName.value = response.data.roomName;
     })
     .catch((error) => {
       console.error("Error loading messages", error);
     });
 };
 
-// 在組件掛載後載入訊息
-loadMessages();
+
+
 </script>
 
 <style scoped>
