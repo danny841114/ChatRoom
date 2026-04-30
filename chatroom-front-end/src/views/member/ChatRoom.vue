@@ -44,19 +44,18 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted, onBeforeUnmount } from "vue";
+import { Client } from "@stomp/stompjs";
 import { useAuthStore } from "@/stores/auth";
+import SockJS from "sockjs-client/dist/sockjs";
 import axios from "axios";
 
 const authStore = useAuthStore();
 const chatRooms = ref([]);
 const chatRoomName = ref("");
+const chatRoomId = ref(1); // 之後要改
 const message = ref("");
 const messages = ref([]);
-
-const getJwtToken = () => {
-  return authStore.token;
-};
 
 const loadChatRooms = async () => {
   try {
@@ -65,7 +64,7 @@ const loadChatRooms = async () => {
       { params: { userId: authStore.userId } },
       {
         headers: {
-          Authorization: `Bearer ${getJwtToken()}`,
+          Authorization: `Bearer ${authStore.token}`,
         },
       },
     );
@@ -78,39 +77,31 @@ const loadChatRooms = async () => {
 
 loadChatRooms();
 
-// 發送訊息到後端
-const sendMessage = (roomId) => {
-  if (!message.value.trim()) return;
+// const sendMessage = (roomId) => {
+//   if (!message.value.trim()) return;
 
-  // 構建訊息對象
-  const msg = {
-    content: message.value,
-    senderId: authStore.userId, 
-  };
+//   const msg = {
+//     content: message.value,
+//     senderId: authStore.userId,
+//   };
 
-  // 清空輸入框
+//   message.value = "";
 
-  // 透過 Axios 發送訊息
-  axios
-    .post(
-      `http://localhost:8080/api/chat/rooms/${roomId}/messages`,
-      msg,
-      {
-        headers: {
-          Authorization: "Bearer " + authStore.token, // 好像沒帶入
-        },
-      },
-    )
-    .then(() => {
-      console.log("Message sent successfully");
-      messages.value.push(msg); // 將訊息推送到畫面上
-    })
-    .catch((error) => {
-      console.error("Error sending message", error);
-    });
-};
+//   axios
+//     .post(`http://localhost:8080/api/chat/rooms/${roomId}/messages`, msg, {
+//       headers: {
+//         Authorization: "Bearer " + authStore.token, // 好像沒帶入
+//       },
+//     })
+//     .then(() => {
+//       console.log("Message sent successfully");
+//       messages.value.push(msg); // 將訊息推送到畫面上
+//     })
+//     .catch((error) => {
+//       console.error("Error sending message", error);
+//     });
+// };
 
-// 載入歷史訊息
 const loadMessages = (chatRoomId) => {
   axios
     .get(
@@ -118,7 +109,7 @@ const loadMessages = (chatRoomId) => {
       { params: { userId: authStore.userId } },
       {
         headers: {
-          Authorization: `Bearer ${getJwtToken()}`,
+          Authorization: `Bearer ${authStore.token}`,
         },
       },
     )
@@ -131,8 +122,75 @@ const loadMessages = (chatRoomId) => {
     });
 };
 
+let stompClient = null;
+let subscription = null;
 
+const connectWebSocket = () => {
+  stompClient = new Client({
+    webSocketFactory: () => new SockJS("http://localhost:8080/ws"),
+    connectHeaders: {
+      Authorization: `Bearer ${authStore.token}`,
+    },
+    debug: (str) => {
+      console.log(str);
+    },
+    reconnectDelay: 5000,
 
+    onConnect: () => {
+      console.log("WebSocket connected");
+
+      subscribeRoom(chatRoomId.value);
+    },
+
+    onStompError: (frame) => {
+      console.error("STOMP error", frame);
+    },
+  });
+
+  stompClient.activate();
+};
+
+const subscribeRoom = (roomId) => {
+  if (subscription) {
+    subscription.unsubscribe();
+  }
+
+  subscription = stompClient.subscribe(
+    `/topic/rooms/${roomId}`,
+    (messageBody) => {
+      const newMessage = JSON.parse(messageBody.body);
+      messages.value.push(newMessage);
+    },
+  );
+};
+
+const sendMessage = () => {
+  if (!message.value.trim()) return;
+
+  stompClient.publish({
+    destination: `/app/chat.sendMessage/${chatRoomId.value}`,
+    body: JSON.stringify({
+      senderId: authStore.userId,
+      content: message.value,
+    }),
+  });
+
+  message.value = "";
+};
+
+onMounted(() => {
+  connectWebSocket();
+});
+
+onBeforeUnmount(() => {
+  if (subscription) {
+    subscription.unsubscribe();
+  }
+
+  if (stompClient) {
+    stompClient.deactivate();
+  }
+});
 </script>
 
 <style scoped>
