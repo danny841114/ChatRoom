@@ -24,9 +24,19 @@
       </div>
 
       <div class="messages">
-        <div v-for="msg in messages" :key="msg.id" class="message">
+        <div
+          v-for="msg in messages"
+          :key="msg.id"
+          class="message"
+          :class="{
+            'my-message': Number(msg.senderId) === Number(authStore.userId),
+          }"
+        >
           <strong>{{ msg.senderName }} ({{ msg.senderAccount }}) :</strong>
           {{ msg.content }}
+          <div class="message-time">
+            {{ formatTime(msg.createdAt) }}
+          </div>
         </div>
       </div>
 
@@ -35,16 +45,23 @@
           v-model="message"
           class="form-control"
           placeholder="輸入訊息..."
+          :disabled="isChatRoomIdEmpty"
           @keyup.enter="sendMessage"
         />
-        <button class="btn btn-primary" @click="sendMessage">送出</button>
+        <button
+          class="btn btn-primary my-btn"
+          :disabled="isChatRoomIdEmpty"
+          @click="sendMessage"
+        >
+          送出
+        </button>
       </div>
     </main>
   </div>
 </template>
 
 <script setup>
-import { ref, watch, onMounted, onBeforeUnmount } from "vue";
+import { ref, watch, computed, onMounted, onBeforeUnmount } from "vue";
 import { Client } from "@stomp/stompjs";
 import { useAuthStore } from "@/stores/auth";
 import SockJS from "sockjs-client/dist/sockjs";
@@ -58,6 +75,9 @@ const chatRoomId = ref("");
 const message = ref("");
 const messages = ref([]);
 
+const isChatRoomIdEmpty = computed(() => {
+  return typeof chatRoomId.value === "string" && chatRoomId.value.trim() === "";
+});
 const loadChatRooms = async () => {
   try {
     const response = await axios.get(`${apiBase}/api/chat/rooms`, {
@@ -105,6 +125,15 @@ const loadMessages = async (roomId) => {
   } catch (e) {
     console.error("Error loading chat room messages", error);
   }
+};
+
+const formatTime = (timeStr) => {
+  const date = new Date(timeStr);
+
+  return date.toLocaleString("zh-TW", {
+    timeZone: "Asia/Taipei",
+    hour12: false,
+  });
 };
 
 let stompClient = null;
@@ -179,9 +208,6 @@ watch(chatRoomId, (newRoomId) => {
   if (newRoomId === undefined || newRoomId === null || newRoomId === "") {
     return;
   }
-
-  console.log("newRoomId", newRoomId);
-
   subscribeRoom(newRoomId);
 });
 </script>
@@ -227,10 +253,30 @@ watch(chatRoomId, (newRoomId) => {
   margin-bottom: 12px;
 }
 
+.my-message {
+  margin-left: auto;
+  text-align: right;
+}
+
+.message-time {
+  font-size: 12px;
+  color: gray;
+  margin-top: 4px;
+}
+
 .input-area {
   display: flex;
   gap: 8px;
   padding: 12px;
   border-top: 1px solid #ddd;
+}
+
+.room-item {
+  cursor: pointer;
+  padding-top: 10px;
+}
+
+.my-btn {
+  width: 70px;
 }
 </style>
