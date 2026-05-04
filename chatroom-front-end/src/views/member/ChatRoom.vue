@@ -72,12 +72,14 @@ const authStore = useAuthStore();
 const chatRooms = ref([]);
 const chatRoomName = ref("");
 const chatRoomId = ref("");
+const chatRoomMembers = ref([]);
 const message = ref("");
 const messages = ref([]);
 
 const isChatRoomIdEmpty = computed(() => {
   return typeof chatRoomId.value === "string" && chatRoomId.value.trim() === "";
 });
+
 const loadChatRooms = async () => {
   try {
     const response = await axios.get(`${apiBase}/api/chat/rooms`, {
@@ -93,7 +95,9 @@ const loadChatRooms = async () => {
   }
 };
 
-loadChatRooms();
+onMounted(() => {
+  loadChatRooms();
+});
 
 const loadMessages = async (roomId) => {
   try {
@@ -106,6 +110,7 @@ const loadMessages = async (roomId) => {
 
     chatRoomId.value = response.data.roomId;
     chatRoomName.value = response.data.name;
+    chatRoomMembers.value = response.data.users;
   } catch (e) {
     console.error("Error loading chat room description", error);
   }
@@ -209,6 +214,10 @@ watch(chatRoomId, (newRoomId) => {
     return;
   }
   subscribeRoom(newRoomId);
+});
+
+watch(chatRoomMembers, (newChatRoomMembers) => {
+  console.log("newChatRoomMembers", newChatRoomMembers);
 });
 </script>
 

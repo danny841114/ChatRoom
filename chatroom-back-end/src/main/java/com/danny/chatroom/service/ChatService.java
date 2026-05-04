@@ -32,10 +32,22 @@ public class ChatService {
                 .stream()
                 .map(member -> {
                     ChatRoom room = member.getChatRoom();
+                    List<ChatRoomResponse.User> users = room.getMembers()
+                            .stream()
+                            .map(m ->
+                                new ChatRoomResponse.User(
+                                        m.getUser().getId(),
+                                        m.getUser().getAccount(),
+                                        m.getUser().getUsername()
+                                )
+                            )
+                            .toList();
+
                     return new ChatRoomResponse(
                             room.getId(),
                             room.getName(),
-                            room.getType()
+                            room.getType(),
+                            users
                     );
                 })
                 .toList();
@@ -47,7 +59,24 @@ public class ChatService {
         Optional<ChatRoom> chatRoomOptional = chatRoomRepository.findById(roomId);
         if (chatRoomOptional.isPresent()) {
             ChatRoom chatRoom = chatRoomOptional.get();
-            return new ChatRoomResponse(chatRoom.getId(), chatRoom.getName(), chatRoom.getType());
+
+            List<ChatRoomResponse.User> users = chatRoom.getMembers()
+                    .stream()
+                    .map(m ->
+                            new ChatRoomResponse.User(
+                                    m.getUser().getId(),
+                                    m.getUser().getAccount(),
+                                    m.getUser().getUsername()
+                            )
+                    )
+                    .toList();
+
+            return new ChatRoomResponse(
+                    chatRoom.getId(),
+                    chatRoom.getName(),
+                    chatRoom.getType(),
+                    users
+            );
         }
         return null;
     }
