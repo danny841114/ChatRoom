@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -38,6 +39,17 @@ public class ChatService {
                     );
                 })
                 .toList();
+    }
+
+    public ChatRoomResponse getRoom(Long roomId, Long userId) {
+        checkRoomMember(roomId, userId);
+
+        Optional<ChatRoom> chatRoomOptional = chatRoomRepository.findById(roomId);
+        if (chatRoomOptional.isPresent()) {
+            ChatRoom chatRoom = chatRoomOptional.get();
+            return new ChatRoomResponse(chatRoom.getId(), chatRoom.getName(), chatRoom.getType());
+        }
+        return null;
     }
 
     public List<ChatMessageResponse> getMessages(Long roomId, Long userId) {

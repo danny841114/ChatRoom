@@ -37,14 +37,14 @@
           placeholder="輸入訊息..."
           @keyup.enter="sendMessage"
         />
-        <button class="btn btn-primary" @click="sendMessage(1)">送出</button>
+        <button class="btn btn-primary" @click="sendMessage">送出</button>
       </div>
     </main>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from "vue";
+import { ref, watch, onMounted, onBeforeUnmount } from "vue";
 import { Client } from "@stomp/stompjs";
 import { useAuthStore } from "@/stores/auth";
 import SockJS from "sockjs-client/dist/sockjs";
@@ -53,7 +53,7 @@ import axios from "axios";
 const authStore = useAuthStore();
 const chatRooms = ref([]);
 const chatRoomName = ref("");
-const chatRoomId = ref(1); // 之後要改
+const chatRoomId = ref("");
 const message = ref("");
 const messages = ref([]);
 
@@ -66,7 +66,7 @@ const loadChatRooms = async () => {
         headers: {
           Authorization: `Bearer ${authStore.token}`,
         },
-      },
+      }
     );
 
     chatRooms.value = response.data;
@@ -77,49 +77,39 @@ const loadChatRooms = async () => {
 
 loadChatRooms();
 
-// const sendMessage = (roomId) => {
-//   if (!message.value.trim()) return;
-
-//   const msg = {
-//     content: message.value,
-//     senderId: authStore.userId,
-//   };
-
-//   message.value = "";
-
-//   axios
-//     .post(`http://localhost:8080/api/chat/rooms/${roomId}/messages`, msg, {
-//       headers: {
-//         Authorization: "Bearer " + authStore.token, // 好像沒帶入
-//       },
-//     })
-//     .then(() => {
-//       console.log("Message sent successfully");
-//       messages.value.push(msg); // 將訊息推送到畫面上
-//     })
-//     .catch((error) => {
-//       console.error("Error sending message", error);
-//     });
-// };
-
-const loadMessages = (chatRoomId) => {
-  axios
-    .get(
-      `http://localhost:8080/api/chat/rooms/${chatRoomId}/messages`,
-      { params: { userId: authStore.userId } },
+const loadMessages = async (roomId) => {
+  try {
+    const response = await axios.get(
+      `http://localhost:8080/api/chat/rooms/${roomId}`,
       {
+        params: { userId: authStore.userId },
         headers: {
           Authorization: `Bearer ${authStore.token}`,
         },
-      },
-    )
-    .then((response) => {
-      messages.value = response.data;
-      chatRoomName.value = response.data.roomName;
-    })
-    .catch((error) => {
-      console.error("Error loading messages", error);
-    });
+      }
+    );
+
+    chatRoomId.value = response.data.roomId;
+    chatRoomName.value = response.data.name;
+  } catch (e) {
+    console.error("Error loading chat room description", error);
+  }
+
+  try {
+    const response2 = await axios.get(
+      `http://localhost:8080/api/chat/rooms/${roomId}/messages`,
+      {
+        params: { userId: authStore.userId },
+        headers: {
+          Authorization: `Bearer ${authStore.token}`,
+        },
+      }
+    );
+
+    messages.value = response2.data;
+  } catch (e) {
+    console.error("Error loading chat room messages", error);
+  }
 };
 
 let stompClient = null;
@@ -138,8 +128,6 @@ const connectWebSocket = () => {
 
     onConnect: () => {
       console.log("WebSocket connected");
-
-      subscribeRoom(chatRoomId.value);
     },
 
     onStompError: (frame) => {
@@ -160,7 +148,7 @@ const subscribeRoom = (roomId) => {
     (messageBody) => {
       const newMessage = JSON.parse(messageBody.body);
       messages.value.push(newMessage);
-    },
+    }
   );
 };
 
@@ -191,12 +179,22 @@ onBeforeUnmount(() => {
     stompClient.deactivate();
   }
 });
+
+watch(chatRoomId, (newRoomId) => {
+  if (newRoomId === undefined || newRoomId === null || newRoomId === "") {
+    return;
+  }
+
+  console.log("newRoomId", newRoomId);
+
+  subscribeRoom(newRoomId);
+});
 </script>
 
 <style scoped>
 .chat-layout {
   display: flex;
-  height: 100vh;
+  height: 85vh;
   overflow: hidden;
 }
 
