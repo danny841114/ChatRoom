@@ -43,8 +43,7 @@
   import axios from "axios";
   import Swal from "sweetalert2";
 
-  // const apiBase = import.meta.env.VITE_API_BASE_URL;
-  const apiBase = "http://localhost:8080";
+  const apiBase = import.meta.env.VITE_API_BASE_URL;
   const account = ref("");
   const password = ref("");
   const errorMsg = ref("");

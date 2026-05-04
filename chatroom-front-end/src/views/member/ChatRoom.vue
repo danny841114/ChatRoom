@@ -50,6 +50,7 @@ import { useAuthStore } from "@/stores/auth";
 import SockJS from "sockjs-client/dist/sockjs";
 import axios from "axios";
 
+const apiBase = import.meta.env.VITE_API_BASE_URL;
 const authStore = useAuthStore();
 const chatRooms = ref([]);
 const chatRoomName = ref("");
@@ -59,15 +60,12 @@ const messages = ref([]);
 
 const loadChatRooms = async () => {
   try {
-    const response = await axios.get(
-      "http://localhost:8080/api/chat/rooms",
-      { params: { userId: authStore.userId } },
-      {
-        headers: {
-          Authorization: `Bearer ${authStore.token}`,
-        },
-      }
-    );
+    const response = await axios.get(`${apiBase}/api/chat/rooms`, {
+      params: { userId: authStore.userId },
+      headers: {
+        Authorization: `Bearer ${authStore.token}`,
+      },
+    });
 
     chatRooms.value = response.data;
   } catch (e) {
@@ -79,15 +77,12 @@ loadChatRooms();
 
 const loadMessages = async (roomId) => {
   try {
-    const response = await axios.get(
-      `http://localhost:8080/api/chat/rooms/${roomId}`,
-      {
-        params: { userId: authStore.userId },
-        headers: {
-          Authorization: `Bearer ${authStore.token}`,
-        },
-      }
-    );
+    const response = await axios.get(`${apiBase}/api/chat/rooms/${roomId}`, {
+      params: { userId: authStore.userId },
+      headers: {
+        Authorization: `Bearer ${authStore.token}`,
+      },
+    });
 
     chatRoomId.value = response.data.roomId;
     chatRoomName.value = response.data.name;
@@ -97,7 +92,7 @@ const loadMessages = async (roomId) => {
 
   try {
     const response2 = await axios.get(
-      `http://localhost:8080/api/chat/rooms/${roomId}/messages`,
+      `${apiBase}/api/chat/rooms/${roomId}/messages`,
       {
         params: { userId: authStore.userId },
         headers: {
@@ -117,7 +112,7 @@ let subscription = null;
 
 const connectWebSocket = () => {
   stompClient = new Client({
-    webSocketFactory: () => new SockJS("http://localhost:8080/ws"),
+    webSocketFactory: () => new SockJS(`${apiBase}/ws`),
     connectHeaders: {
       Authorization: `Bearer ${authStore.token}`,
     },

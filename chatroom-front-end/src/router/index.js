@@ -1,8 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
 import Index from "@/views/Index.vue";
-import AddProduct from "@/views/product/AddProduct.vue";
-import ManageProduct from "@/views/product/ManageProduct.vue";
-import ModifyProduct from "@/views/product/ModifyProduct.vue";
 import Login from "@/views/member/Login.vue";
 import ChatRoom from "@/views/member/ChatRoom.vue";
 
@@ -14,21 +11,6 @@ const router = createRouter({
       name: "Index",
       component: Index,
       alias: "/index",
-    },
-    {
-      path: "/product/add",
-      name: "AddProduct",
-      component: AddProduct,
-    },
-    {
-      path: "/product/manage",
-      name: "ManageProduct",
-      component: ManageProduct,
-    },
-    {
-      path: "/product/modify",
-      name: "ModifyProduct",
-      component: ModifyProduct,
     },
     {
       path: "/login",
