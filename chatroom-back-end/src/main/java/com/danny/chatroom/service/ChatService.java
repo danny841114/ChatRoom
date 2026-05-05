@@ -1,8 +1,6 @@
 package com.danny.chatroom.service;
 
-import com.danny.chatroom.dto.ChatMessageResponse;
-import com.danny.chatroom.dto.ChatRoomResponse;
-import com.danny.chatroom.dto.SendMessageRequest;
+import com.danny.chatroom.dto.*;
 import com.danny.chatroom.entity.ChatMessage;
 import com.danny.chatroom.entity.ChatRoom;
 import com.danny.chatroom.entity.ChatRoomMember;
@@ -17,8 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @RequiredArgsConstructor
 @Service
@@ -120,8 +117,68 @@ public class ChatService {
         return toMessageResponse(savedMessage);
     }
 
-    public List<ChatRoomMember> findByChatRoomId(Long roomId){
+    public List<ChatRoomMember> findByChatRoomId(Long roomId) {
         return chatRoomMemberRepository.findByChatRoomId(roomId);
+    }
+
+    public ChatRoomResponse addChatRoomAndUsers(Long userId, AddChatRoomRequest addChatRoomRequest) {
+        LocalDateTime now = LocalDateTime.now();
+
+        ChatRoom newChatRoom = new ChatRoom();
+        newChatRoom.setName(addChatRoomRequest.getName());
+        newChatRoom.setType(addChatRoomRequest.getType());
+        newChatRoom.setCreatedAt(now);
+        newChatRoom.setLastMessageTime(now);
+        chatRoomRepository.save(newChatRoom);
+
+        List<ChatRoomMember> chatRoomMembers = new ArrayList<>();
+
+        Set<Long> memberIds = addChatRoomRequest.getMemberIds();
+        memberIds.add(userId);
+        for (Long memberId : memberIds) {
+            User user = userRepository.findById(memberId)
+                    .orElseThrow(() -> new EntityNotFoundException("使用者不存在"));
+
+            ChatRoomMember chatRoomMember = new ChatRoomMember();
+            chatRoomMember.setUser(user);
+            chatRoomMember.setChatRoom(newChatRoom);
+            chatRoomMember.setJoinedAt(now);
+
+            chatRoomMembers.add(chatRoomMember);
+        }
+        chatRoomMemberRepository.saveAll(chatRoomMembers);
+
+        List<ChatRoomResponse.User> users = chatRoomMembers
+                .stream()
+                .map(chatRoomMember -> {
+                    User user = chatRoomMember.getUser();
+                    return new ChatRoomResponse.User(
+                            user.getId(),
+                            user.getAccount(),
+                            user.getUsername()
+                    );
+                })
+                .toList();
+
+        return new ChatRoomResponse(
+                newChatRoom.getId(),
+                newChatRoom.getName(),
+                newChatRoom.getType(),
+                users
+        );
+    }
+
+    public List<UserResponse> getUsersExceptMe(Long userId) {
+        List<User> allUsers = userRepository.findAll();
+
+        return allUsers
+                .stream()
+                .filter(user -> !Objects.equals(user.getId(), userId))
+                .map(user -> new UserResponse(
+                        user.getId(),
+                        user.getAccount(),
+                        user.getUsername()))
+                .toList();
     }
 
     private void checkRoomMember(Long roomId, Long userId) {

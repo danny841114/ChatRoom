@@ -1,8 +1,6 @@
 package com.danny.chatroom.controller;
 
-import com.danny.chatroom.dto.ChatMessageResponse;
-import com.danny.chatroom.dto.ChatRoomResponse;
-import com.danny.chatroom.dto.SendMessageRequest;
+import com.danny.chatroom.dto.*;
 import com.danny.chatroom.service.ChatService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -36,5 +34,17 @@ public class ChatController {
             @RequestParam Long userId) {
         List<ChatMessageResponse> messages = chatService.getMessages(roomId, userId);
         return ResponseEntity.ok(messages);
+    }
+
+    @PostMapping("/rooms")
+    public ResponseEntity<ChatRoomResponse> addChatRoomAndUsers(@RequestParam Long userId, @RequestBody AddChatRoomRequest request) {
+        ChatRoomResponse room = chatService.addChatRoomAndUsers(userId, request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(room);
+    }
+
+    @GetMapping("/rooms/users")
+    public ResponseEntity<List<UserResponse>> getUsersExceptMe(@RequestParam Long userId) {
+        List<UserResponse> users = chatService.getUsersExceptMe(userId);
+        return ResponseEntity.ok(users);
     }
 }

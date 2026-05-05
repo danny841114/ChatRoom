@@ -2,7 +2,9 @@
   <div class="chat-layout">
     <!-- 左側聊天室列表 -->
     <aside class="chat-sidebar">
-      <h5>聊天室</h5>
+      <h4>聊天室</h4>
+
+      <button class="btn btn-primary" @click="openModal">新增聊天</button>
 
       <div
         v-for="room in chatRooms"
@@ -49,7 +51,7 @@
           @keyup.enter="sendMessage"
         />
         <button
-          class="btn btn-primary my-btn"
+          class="btn btn-primary send-btn"
           :disabled="isChatRoomIdEmpty"
           @click="sendMessage"
         >
@@ -58,6 +60,12 @@
       </div>
     </main>
   </div>
+
+  <AddChatRoomModal
+    v-show="showModal"
+    @close="showModal = false"
+    @created="handleCreated"
+  ></AddChatRoomModal>
 </template>
 
 <script setup>
@@ -66,6 +74,7 @@ import { Client } from "@stomp/stompjs";
 import { useAuthStore } from "@/stores/auth";
 import SockJS from "sockjs-client/dist/sockjs";
 import axios from "axios";
+import AddChatRoomModal from "@/components/AddChatRoomModal.vue";
 
 const apiBase = import.meta.env.VITE_API_BASE_URL;
 const authStore = useAuthStore();
@@ -139,6 +148,16 @@ const formatTime = (timeStr) => {
     timeZone: "Asia/Taipei",
     hour12: false,
   });
+};
+
+const showModal = ref(false);
+const openModal = () => {
+  showModal.value = true;
+};
+
+const handleCreated = () => {
+  showModal.value = false;
+  loadChatRooms();
 };
 
 let stompClient = null;
@@ -305,7 +324,7 @@ watch(chatRoomMembers, (newChatRoomMembers) => {
   padding-top: 10px;
 }
 
-.my-btn {
+.send-btn {
   width: 70px;
 }
 </style>
