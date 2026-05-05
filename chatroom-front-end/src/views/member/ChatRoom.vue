@@ -21,8 +21,12 @@
 
     <!-- 右側聊天室主體 -->
     <main class="chat-main">
-      <div class="chat-header">
-        {{ chatRoomName }}
+      <div
+        class="chat-header"
+        style="cursor: pointer"
+        @click="openChatRoomDetailModal"
+      >
+        {{ currentChatRoom.name }}
       </div>
 
       <div class="messages">
@@ -62,10 +66,15 @@
   </div>
 
   <AddChatRoomModal
-    v-show="showModal"
-    @close="showModal = false"
+    v-show="showAddChatRoomModal"
+    @close="showAddChatRoomModal = false"
     @created="handleCreated"
   ></AddChatRoomModal>
+
+  <ChatRoomDetail
+    v-show="showChatRoomDetailModal"
+    @close="showChatRoomDetailModal = false"
+  ></ChatRoomDetail>
 </template>
 
 <script setup>
@@ -75,18 +84,26 @@ import { useAuthStore } from "@/stores/auth";
 import SockJS from "sockjs-client/dist/sockjs";
 import axios from "axios";
 import AddChatRoomModal from "@/components/AddChatRoomModal.vue";
+import ChatRoomDetail from "@/components/ChatRoomDetail.vue";
 
 const apiBase = import.meta.env.VITE_API_BASE_URL;
 const authStore = useAuthStore();
 const chatRooms = ref([]);
-const chatRoomName = ref("");
-const chatRoomId = ref("");
-const chatRoomMembers = ref([]);
+const currentChatRoom = ref({
+  roomId: "",
+  name: "",
+  users: [],
+});
 const message = ref("");
 const messages = ref([]);
+const showAddChatRoomModal = ref(false);
+const showChatRoomDetailModal = ref(false);
 
 const isChatRoomIdEmpty = computed(() => {
-  return typeof chatRoomId.value === "string" && chatRoomId.value.trim() === "";
+  return (
+    typeof currentChatRoom.value.roomId === "string" &&
+    currentChatRoom.value.roomId.trim() === ""
+  );
 });
 
 const loadChatRooms = async () => {
@@ -117,9 +134,9 @@ const loadMessages = async (roomId) => {
       },
     });
 
-    chatRoomId.value = response.data.roomId;
-    chatRoomName.value = response.data.name;
-    chatRoomMembers.value = response.data.users;
+    currentChatRoom.value = response.data;
+
+    console.log("currentChatRoom.value", currentChatRoom.value);
   } catch (e) {
     console.error("Error loading chat room description", error);
   }
@@ -150,14 +167,17 @@ const formatTime = (timeStr) => {
   });
 };
 
-const showModal = ref(false);
 const openModal = () => {
-  showModal.value = true;
+  showAddChatRoomModal.value = true;
 };
 
 const handleCreated = () => {
-  showModal.value = false;
+  showAddChatRoomModal.value = false;
   loadChatRooms();
+};
+
+const openChatRoomDetailModal = () => {
+  showChatRoomDetailModal.value = true;
 };
 
 let stompClient = null;
@@ -219,7 +239,7 @@ const sendMessage = () => {
   if (!message.value.trim()) return;
 
   stompClient.publish({
-    destination: `/app/chat.sendMessage/${chatRoomId.value}`,
+    destination: `/app/chat.sendMessage/${currentChatRoom.value.roomId}`,
     body: JSON.stringify({
       senderId: authStore.userId,
       content: message.value,
@@ -247,17 +267,16 @@ onBeforeUnmount(() => {
   }
 });
 
-watch(chatRoomId, (newRoomId) => {
+watch(currentChatRoom, (currentChatRoom) => {
+  const newRoomId = currentChatRoom.roomId;
   if (newRoomId === undefined || newRoomId === null || newRoomId === "") {
     return;
   }
+
   subscribeRoom(newRoomId);
-  subscribeRoomList(newRoomId);
+  if (!roomListSubscription) subscribeRoomList();
 });
 
-watch(chatRoomMembers, (newChatRoomMembers) => {
-  console.log("newChatRoomMembers", newChatRoomMembers);
-});
 </script>
 
 <style scoped>
