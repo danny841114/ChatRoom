@@ -20,8 +20,11 @@ public class ChatRoom {
 
     private String type; // PRIVATE / GROUP
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
+
+    @Column(name = "last_message_time", nullable = false)
+    private LocalDateTime lastMessageTime;
 
     @OneToMany(mappedBy = "chatRoom", fetch = FetchType.LAZY)
     private List<ChatRoomMember> members;

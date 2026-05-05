@@ -28,18 +28,18 @@ public class ChatService {
     private final UserRepository userRepository;
 
     public List<ChatRoomResponse> getMyRooms(Long userId) {
-        return chatRoomMemberRepository.findByUserId(userId)
+        return chatRoomMemberRepository.findByUserIdOrderByChatRoomLastMessageTimeDesc(userId)
                 .stream()
                 .map(member -> {
                     ChatRoom room = member.getChatRoom();
                     List<ChatRoomResponse.User> users = room.getMembers()
                             .stream()
                             .map(m ->
-                                new ChatRoomResponse.User(
-                                        m.getUser().getId(),
-                                        m.getUser().getAccount(),
-                                        m.getUser().getUsername()
-                                )
+                                    new ChatRoomResponse.User(
+                                            m.getUser().getId(),
+                                            m.getUser().getAccount(),
+                                            m.getUser().getUsername()
+                                    )
                             )
                             .toList();
 
@@ -102,13 +102,17 @@ public class ChatService {
         User sender = userRepository.findById(senderId)
                 .orElseThrow(() -> new EntityNotFoundException("使用者不存在"));
 
+        LocalDateTime now = LocalDateTime.now();
+
+        room.setLastMessageTime(now);
+        chatRoomRepository.save(room);
+
         ChatMessage message = new ChatMessage();
         message.setChatRoom(room);
         message.setSender(sender);
         message.setContent(request.getContent());
         message.setMessageType("TEXT");
-        message.setCreatedAt(LocalDateTime.now());
-
+        message.setCreatedAt(now);
         ChatMessage savedMessage = chatMessageRepository.save(message);
 
         return toMessageResponse(savedMessage);
