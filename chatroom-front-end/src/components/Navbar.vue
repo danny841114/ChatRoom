@@ -38,9 +38,7 @@
             <span class="nav-link disabled">{{ authStore.username }}</span>
           </li>
           <li class="nav-item" v-if="authStore.account">
-            <router-link class="nav-link" to="/chat"
-              >聊天</router-link
-            >
+            <router-link class="nav-link" to="/chat">聊天</router-link>
           </li>
           <li class="nav-item" v-if="authStore.account">
             <a class="nav-link" @click="logout" style="cursor: pointer">登出</a>

@@ -1,7 +1,7 @@
 <template>
   <div class="modal-backdrop-custom">
     <div class="modal-content-custom">
-      <h5 class="center-flex">新增聊天室</h5>
+      <h5 class="text-center">新增聊天室</h5>
 
       <div class="input-group mb-3">
         <span class="input-group-text">名稱</span>
@@ -25,7 +25,7 @@
         </select>
       </div>
 
-      <div class="mb-3 center-flex">
+      <div class="mt-3 text-center">
         <button class="btn btn-primary" @click="createRoom">建立</button>&nbsp;
         <button class="btn btn-primary" @click="$emit('close')">取消</button>
       </div>
@@ -68,7 +68,7 @@ const createRoom = async () => {
       form.value,
       {
         params: { userId: authStore.userId },
-      }
+      },
     );
 
     emit("created");
@@ -82,7 +82,7 @@ onMounted(() => {
 });
 </script>
 
-<style>
+<style scoped>
 .modal-backdrop-custom {
   position: fixed;
   top: 0;
@@ -100,13 +100,7 @@ onMounted(() => {
   background: white;
   padding: 20px;
   border-radius: 10px;
-  width: 100vh;
-  height: 70vh;
-}
-
-.center-flex {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  width: 40%;
+  height: auto;
 }
 </style>

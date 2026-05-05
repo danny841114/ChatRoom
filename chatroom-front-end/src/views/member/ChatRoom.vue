@@ -4,15 +4,18 @@
     <aside class="chat-sidebar">
       <h4>聊天室</h4>
 
-      <button class="btn btn-primary" @click="openModal">新增聊天</button>
+      <button class="btn btn-primary mb-3" @click="openModal">新增聊天</button>
 
       <div
         v-for="room in chatRooms"
         :key="room.roomId"
-        class="room-item"
+        class="list-group"
+        style="cursor: pointer"
         @click="loadMessages(room.roomId)"
       >
-        <div class="room-name">{{ room.name }}</div>
+        <div class="list-group-item list-group-item-action room-name">
+          {{ room.name }}
+        </div>
         <!-- <div class="room-type">
           {{ room.type === "PRIVATE" ? "私人聊天室" : "群組聊天室" }}
         </div> -->
@@ -73,6 +76,7 @@
 
   <ChatRoomDetail
     v-show="showChatRoomDetailModal"
+    :chat-room="currentChatRoom"
     @close="showChatRoomDetailModal = false"
   ></ChatRoomDetail>
 </template>
@@ -81,7 +85,7 @@
 import { ref, watch, computed, onMounted, onBeforeUnmount } from "vue";
 import { Client } from "@stomp/stompjs";
 import { useAuthStore } from "@/stores/auth";
-import SockJS from "sockjs-client/dist/sockjs";
+import SockJS from "sockjs-client";
 import axios from "axios";
 import AddChatRoomModal from "@/components/AddChatRoomModal.vue";
 import ChatRoomDetail from "@/components/ChatRoomDetail.vue";
@@ -121,10 +125,6 @@ const loadChatRooms = async () => {
   }
 };
 
-onMounted(() => {
-  loadChatRooms();
-});
-
 const loadMessages = async (roomId) => {
   try {
     const response = await axios.get(`${apiBase}/api/chat/rooms/${roomId}`, {
@@ -135,8 +135,6 @@ const loadMessages = async (roomId) => {
     });
 
     currentChatRoom.value = response.data;
-
-    console.log("currentChatRoom.value", currentChatRoom.value);
   } catch (e) {
     console.error("Error loading chat room description", error);
   }
@@ -149,7 +147,7 @@ const loadMessages = async (roomId) => {
         headers: {
           Authorization: `Bearer ${authStore.token}`,
         },
-      }
+      },
     );
 
     messages.value = response2.data;
@@ -197,6 +195,7 @@ const connectWebSocket = () => {
 
     onConnect: () => {
       console.log("WebSocket connected");
+      subscribeRoomList(); // 先訂閱聊天室動態
     },
 
     onStompError: (frame) => {
@@ -208,30 +207,26 @@ const connectWebSocket = () => {
 };
 
 const subscribeRoom = (roomId) => {
-  if (subscription) {
-    subscription.unsubscribe();
-  }
+  if (subscription) subscription.unsubscribe();
 
   subscription = stompClient.subscribe(
     `/topic/rooms/${roomId}`,
     (messageBody) => {
       const newMessage = JSON.parse(messageBody.body);
       messages.value.push(newMessage);
-    }
+    },
   );
 };
 
 const subscribeRoomList = () => {
-  if (roomListSubscription) {
-    roomListSubscription.unsubscribe();
-  }
+  if (roomListSubscription) roomListSubscription.unsubscribe();
 
   roomListSubscription = stompClient.subscribe(
     `/topic/users/${authStore.userId}/rooms`,
     (messageBody) => {
       const updatedRooms = JSON.parse(messageBody.body);
       chatRooms.value = updatedRooms;
-    }
+    },
   );
 };
 
@@ -250,33 +245,23 @@ const sendMessage = () => {
 };
 
 onMounted(() => {
+  loadChatRooms();
   connectWebSocket();
 });
 
 onBeforeUnmount(() => {
-  if (subscription) {
-    subscription.unsubscribe();
-  }
-
-  if (roomListSubscription) {
-    roomListSubscription.unsubscribe();
-  }
-
-  if (stompClient) {
-    stompClient.deactivate();
-  }
+  if (subscription) subscription.unsubscribe();
+  if (roomListSubscription) roomListSubscription.unsubscribe();
+  if (stompClient) stompClient.deactivate();
 });
 
 watch(currentChatRoom, (currentChatRoom) => {
   const newRoomId = currentChatRoom.roomId;
-  if (newRoomId === undefined || newRoomId === null || newRoomId === "") {
-    return;
-  }
+  if (newRoomId === undefined || newRoomId === null || newRoomId === "") return;
 
   subscribeRoom(newRoomId);
   if (!roomListSubscription) subscribeRoomList();
 });
-
 </script>
 
 <style scoped>
@@ -341,6 +326,12 @@ watch(currentChatRoom, (currentChatRoom) => {
 .room-item {
   cursor: pointer;
   padding-top: 10px;
+}
+
+.room-name {
+  white-space: nowrap; /* 不換行 */
+  overflow: hidden; /* 超出隱藏 */
+  text-overflow: ellipsis; /* 顯示 ... */
 }
 
 .send-btn {
