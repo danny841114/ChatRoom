@@ -143,6 +143,7 @@ const formatTime = (timeStr) => {
 
 let stompClient = null;
 let subscription = null;
+let roomListSubscription = null;
 
 const connectWebSocket = () => {
   stompClient = new Client({
@@ -181,6 +182,20 @@ const subscribeRoom = (roomId) => {
   );
 };
 
+const subscribeRoomList = () => {
+  if (roomListSubscription) {
+    roomListSubscription.unsubscribe();
+  }
+
+  roomListSubscription = stompClient.subscribe(
+    `/topic/users/${authStore.userId}/rooms`,
+    (messageBody) => {
+      const updatedRooms = JSON.parse(messageBody.body);
+      chatRooms.value = updatedRooms;
+    }
+  );
+};
+
 const sendMessage = () => {
   if (!message.value.trim()) return;
 
@@ -204,6 +219,10 @@ onBeforeUnmount(() => {
     subscription.unsubscribe();
   }
 
+  if (roomListSubscription) {
+    roomListSubscription.unsubscribe();
+  }
+
   if (stompClient) {
     stompClient.deactivate();
   }
@@ -214,6 +233,7 @@ watch(chatRoomId, (newRoomId) => {
     return;
   }
   subscribeRoom(newRoomId);
+  subscribeRoomList(newRoomId);
 });
 
 watch(chatRoomMembers, (newChatRoomMembers) => {

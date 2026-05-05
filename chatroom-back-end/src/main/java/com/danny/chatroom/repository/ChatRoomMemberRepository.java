@@ -10,4 +10,5 @@ import java.util.List;
 public interface ChatRoomMemberRepository extends JpaRepository<ChatRoomMember, Long> {
     boolean existsByChatRoomIdAndUserId(Long roomId, Long userId);
     List<ChatRoomMember> findByUserIdOrderByChatRoomLastMessageTimeDesc(Long userId);
+    List<ChatRoomMember> findByChatRoomId(Long roomId);
 }

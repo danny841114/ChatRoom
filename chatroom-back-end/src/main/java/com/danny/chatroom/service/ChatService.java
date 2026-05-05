@@ -5,6 +5,7 @@ import com.danny.chatroom.dto.ChatRoomResponse;
 import com.danny.chatroom.dto.SendMessageRequest;
 import com.danny.chatroom.entity.ChatMessage;
 import com.danny.chatroom.entity.ChatRoom;
+import com.danny.chatroom.entity.ChatRoomMember;
 import com.danny.chatroom.entity.User;
 import com.danny.chatroom.repository.ChatMessageRepository;
 import com.danny.chatroom.repository.ChatRoomMemberRepository;
@@ -27,6 +28,7 @@ public class ChatService {
     private final ChatRoomRepository chatRoomRepository;
     private final UserRepository userRepository;
 
+    @Transactional(readOnly = true)
     public List<ChatRoomResponse> getMyRooms(Long userId) {
         return chatRoomMemberRepository.findByUserIdOrderByChatRoomLastMessageTimeDesc(userId)
                 .stream()
@@ -116,6 +118,10 @@ public class ChatService {
         ChatMessage savedMessage = chatMessageRepository.save(message);
 
         return toMessageResponse(savedMessage);
+    }
+
+    public List<ChatRoomMember> findByChatRoomId(Long roomId){
+        return chatRoomMemberRepository.findByChatRoomId(roomId);
     }
 
     private void checkRoomMember(Long roomId, Long userId) {
