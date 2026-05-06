@@ -14,7 +14,8 @@
         @click="loadMessages(room.roomId)"
       >
         <div class="list-group-item list-group-item-action room-name">
-          {{ room.name }}
+          {{ room.name }} {{ room.unreadMessagesCount }}
+          <!-- 樣式調整及零不顯示 -->
         </div>
         <!-- <div class="room-type">
           {{ room.type === "PRIVATE" ? "私人聊天室" : "群組聊天室" }}

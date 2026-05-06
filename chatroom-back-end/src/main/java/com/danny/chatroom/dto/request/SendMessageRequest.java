@@ -1,4 +1,4 @@
-package com.danny.chatroom.dto;
+package com.danny.chatroom.dto.request;
 
 import lombok.Getter;
 import lombok.Setter;

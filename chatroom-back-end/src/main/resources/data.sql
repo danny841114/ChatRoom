@@ -8,22 +8,22 @@ INSERT INTO users (account, username, password, created_at) VALUES
 INSERT INTO chat_room (name, type, created_at, last_message_time) VALUES
 ('General Chat', 'GROUP', '2026-04-29 09:30:00', '2026-04-29 10:10:00'),
 ('Tech Talk', 'GROUP', '2026-04-29 09:35:00','2026-04-29 10:20:00'),
-('Private Chat - Danny & Amy', 'PRIVATE', '2026-04-29 09:40:00', '2026-04-29 10:30:00'),
+('Danny & Amy', 'PRIVATE', '2026-04-29 09:40:00', '2026-04-29 10:30:00'),
 ('Support', 'GROUP', '2026-04-29 09:45:00', '2026-04-29 10:40:00'),
 ('Gaming', 'GROUP', '2026-04-29 09:50:00', '2026-04-29 10:50:00');
 
-INSERT INTO chat_room_member (room_id, user_id, joined_at) VALUES
-(1, 1, '2026-04-29 10:00:00'), -- General Chat: Danny
-(1, 2, '2026-04-29 10:05:00'), -- General Chat: Amy
-(1, 3, '2026-04-29 10:10:00'), -- General Chat: Mike
-(2, 3, '2026-04-29 10:15:00'), -- Tech Talk: Mike
-(2, 1, '2026-04-29 10:20:00'), -- Tech Talk: Danny
-(3, 1, '2026-04-29 10:25:00'), -- Private Chat: Danny
-(3, 2, '2026-04-29 10:30:00'), -- Private Chat: Amy
-(4, 4, '2026-04-29 10:35:00'), -- Support: John
-(4, 5, '2026-04-29 10:40:00'), -- Support: Eva
-(5, 5, '2026-04-29 10:45:00'), -- Gaming: Eva
-(5, 2, '2026-04-29 10:50:00'); -- Gaming: Amy
+INSERT INTO chat_room_member (room_id, user_id, joined_at, last_read_at) VALUES
+(1, 1, '2026-04-29 10:00:00', '2026-04-29 18:27:00'), -- General Chat: Danny
+(1, 2, '2026-04-29 10:05:00', '2026-04-30 10:00:00'), -- General Chat: Amy
+(1, 3, '2026-04-29 10:10:00', '2026-04-30 10:00:00'), -- General Chat: Mike
+(2, 3, '2026-04-29 10:15:00', '2026-04-30 10:00:00'), -- Tech Talk: Mike
+(2, 1, '2026-04-29 10:20:00', '2026-04-30 18:03:00'), -- Tech Talk: Danny
+(3, 1, '2026-04-29 10:25:00', '2026-04-29 18:27:00'), -- Private Chat: Danny
+(3, 2, '2026-04-29 10:30:00', '2026-04-30 10:00:00'), -- Private Chat: Amy
+(4, 4, '2026-04-29 10:35:00', '2026-04-30 10:00:00'), -- Support: John
+(4, 5, '2026-04-29 10:40:00', '2026-04-30 10:00:00'), -- Support: Eva
+(5, 5, '2026-04-29 10:45:00', '2026-04-30 10:00:00'), -- Gaming: Eva
+(5, 2, '2026-04-29 10:50:00', '2026-04-30 10:00:00'); -- Gaming: Amy
 
 INSERT INTO chat_message (room_id, sender_id, content, created_at) VALUES
 (1, 1, 'Hello everyone!', '2026-04-29 10:00:00'),

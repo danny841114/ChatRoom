@@ -1,4 +1,4 @@
-package com.danny.chatroom.dto;
+package com.danny.chatroom.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,6 +13,7 @@ public class ChatRoomResponse {
     private Long roomId;
     private String name;
     private String type;
+    private Long unreadMessagesCount;
     private List<User> users;
 
     @Getter

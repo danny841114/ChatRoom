@@ -1,4 +1,4 @@
-package com.danny.chatroom.dto;
+package com.danny.chatroom.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

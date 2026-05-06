@@ -1,6 +1,10 @@
 package com.danny.chatroom.service;
 
-import com.danny.chatroom.dto.*;
+import com.danny.chatroom.dto.request.AddChatRoomRequest;
+import com.danny.chatroom.dto.request.SendMessageRequest;
+import com.danny.chatroom.dto.response.ChatMessageResponse;
+import com.danny.chatroom.dto.response.ChatRoomResponse;
+import com.danny.chatroom.dto.response.UserResponse;
 import com.danny.chatroom.entity.ChatMessage;
 import com.danny.chatroom.entity.ChatRoom;
 import com.danny.chatroom.entity.ChatRoomMember;
@@ -29,8 +33,11 @@ public class ChatService {
     public List<ChatRoomResponse> getMyRooms(Long userId) {
         return chatRoomMemberRepository.findByUserIdOrderByChatRoomLastMessageTimeDesc(userId)
                 .stream()
-                .map(member -> {
-                    ChatRoom room = member.getChatRoom();
+                .map(chatRoomMember -> {
+                    ChatRoom room = chatRoomMember.getChatRoom();
+
+                    Long count = chatRoomMemberRepository.countUnreadMessages(userId, room.getId());
+
                     List<ChatRoomResponse.User> users = room.getMembers()
                             .stream()
                             .map(m ->
@@ -46,6 +53,7 @@ public class ChatService {
                             room.getId(),
                             room.getName(),
                             room.getType(),
+                            count,
                             users
                     );
                 })
@@ -54,6 +62,8 @@ public class ChatService {
 
     public ChatRoomResponse getRoom(Long roomId, Long userId) {
         checkRoomMember(roomId, userId);
+
+        Long count = chatRoomMemberRepository.countUnreadMessages(userId, roomId);
 
         Optional<ChatRoom> chatRoomOptional = chatRoomRepository.findById(roomId);
         if (chatRoomOptional.isPresent()) {
@@ -74,6 +84,7 @@ public class ChatService {
                     chatRoom.getId(),
                     chatRoom.getName(),
                     chatRoom.getType(),
+                    count,
                     users
             );
         }
@@ -164,6 +175,7 @@ public class ChatService {
                 newChatRoom.getId(),
                 newChatRoom.getName(),
                 newChatRoom.getType(),
+                0L,
                 users
         );
     }

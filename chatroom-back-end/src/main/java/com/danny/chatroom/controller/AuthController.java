@@ -1,6 +1,6 @@
 package com.danny.chatroom.controller;
 
-import com.danny.chatroom.dto.LoginRequest;
+import com.danny.chatroom.dto.request.LoginRequest;
 import com.danny.chatroom.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
