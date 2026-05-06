@@ -12,11 +12,12 @@ import java.util.List;
 public interface ChatRoomMemberRepository extends JpaRepository<ChatRoomMember, Long> {
     boolean existsByChatRoomIdAndUserId(Long roomId, Long userId);
 
+    ChatRoomMember findByChatRoomIdAndUserId(Long roomId, Long userId);
+
     List<ChatRoomMember> findByUserIdOrderByChatRoomLastMessageTimeDesc(Long userId);
 
     List<ChatRoomMember> findByChatRoomId(Long roomId);
 
-    // 邏輯不對
     @Query("""
                 SELECT COUNT(m.id)
                 FROM ChatRoomMember rm
@@ -24,6 +25,7 @@ public interface ChatRoomMemberRepository extends JpaRepository<ChatRoomMember, 
                 WHERE rm.user.id = :userId
                   AND rm.chatRoom.id = :roomId
                   AND m.createdAt > rm.lastReadAt
+                  AND m.sender.id <> :userId
             """)
     Long countUnreadMessages(@Param("userId") Long userId, @Param("roomId") Long roomId);
 }

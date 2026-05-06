@@ -12,7 +12,7 @@
     "
   >
     <div class="container-fluid">
-      <a class="navbar-brand">玉山</a>
+      <a class="navbar-brand">ChatRoom</a>
 
       <button
         class="navbar-toggler"

@@ -13,12 +13,12 @@ INSERT INTO chat_room (name, type, created_at, last_message_time) VALUES
 ('Gaming', 'GROUP', '2026-04-29 09:50:00', '2026-04-29 10:50:00');
 
 INSERT INTO chat_room_member (room_id, user_id, joined_at, last_read_at) VALUES
-(1, 1, '2026-04-29 10:00:00', '2026-04-29 18:27:00'), -- General Chat: Danny
+(1, 1, '2026-04-29 10:00:00', '2026-04-29 10:01:00'), -- General Chat: Danny
 (1, 2, '2026-04-29 10:05:00', '2026-04-30 10:00:00'), -- General Chat: Amy
 (1, 3, '2026-04-29 10:10:00', '2026-04-30 10:00:00'), -- General Chat: Mike
 (2, 3, '2026-04-29 10:15:00', '2026-04-30 10:00:00'), -- Tech Talk: Mike
-(2, 1, '2026-04-29 10:20:00', '2026-04-30 18:03:00'), -- Tech Talk: Danny
-(3, 1, '2026-04-29 10:25:00', '2026-04-29 18:27:00'), -- Private Chat: Danny
+(2, 1, '2026-04-29 10:20:00', '2026-04-30 10:00:00'), -- Tech Talk: Danny
+(3, 1, '2026-04-29 10:25:00', '2026-04-29 10:28:00'), -- Private Chat: Danny
 (3, 2, '2026-04-29 10:30:00', '2026-04-30 10:00:00'), -- Private Chat: Amy
 (4, 4, '2026-04-29 10:35:00', '2026-04-30 10:00:00'), -- Support: John
 (4, 5, '2026-04-29 10:40:00', '2026-04-30 10:00:00'), -- Support: Eva
@@ -28,6 +28,7 @@ INSERT INTO chat_room_member (room_id, user_id, joined_at, last_read_at) VALUES
 INSERT INTO chat_message (room_id, sender_id, content, created_at) VALUES
 (1, 1, 'Hello everyone!', '2026-04-29 10:00:00'),
 (1, 2, 'Hi Danny!', '2026-04-29 10:05:00'),
+(1, 2, 'How are you?', '2026-04-29 10:05:00'),
 (1, 3, 'Anyone here into programming?', '2026-04-29 10:10:00'),
 (2, 3, 'What’s the best Java framework?', '2026-04-29 10:15:00'),
 (2, 1, 'Spring Boot is really popular right now.', '2026-04-29 10:20:00'),

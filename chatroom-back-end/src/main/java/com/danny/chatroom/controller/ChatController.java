@@ -14,24 +14,24 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/chat")
+@RequestMapping("/api/chat/rooms")
 public class ChatController {
     private final ChatService chatService;
 
-    @GetMapping("/rooms")
+    @GetMapping
     public ResponseEntity<List<ChatRoomResponse>> getMyRooms(@RequestParam Long userId) {
         List<ChatRoomResponse> rooms = chatService.getMyRooms(userId);
         return ResponseEntity.ok(rooms);
     }
 
-    @GetMapping("/rooms/{roomId}")
+    @GetMapping("/{roomId}")
     public ResponseEntity<ChatRoomResponse> getRoom(@PathVariable Long roomId,
                                                     @RequestParam Long userId) {
         ChatRoomResponse room = chatService.getRoom(roomId, userId);
         return ResponseEntity.ok(room);
     }
 
-    @GetMapping("/rooms/{roomId}/messages")
+    @GetMapping("/{roomId}/messages")
     public ResponseEntity<List<ChatMessageResponse>> getMessages(
             @PathVariable Long roomId,
             @RequestParam Long userId) {
@@ -39,13 +39,14 @@ public class ChatController {
         return ResponseEntity.ok(messages);
     }
 
-    @PostMapping("/rooms")
-    public ResponseEntity<ChatRoomResponse> addChatRoomAndUsers(@RequestParam Long userId, @RequestBody AddChatRoomRequest request) {
+    @PostMapping
+    public ResponseEntity<ChatRoomResponse> addChatRoomAndUsers(@RequestParam Long userId,
+                                                                @RequestBody AddChatRoomRequest request) {
         ChatRoomResponse room = chatService.addChatRoomAndUsers(userId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(room);
     }
 
-    @GetMapping("/rooms/users")
+    @GetMapping("/users")
     public ResponseEntity<List<UserResponse>> getUsersExceptMe(@RequestParam Long userId) {
         List<UserResponse> users = chatService.getUsersExceptMe(userId);
         return ResponseEntity.ok(users);

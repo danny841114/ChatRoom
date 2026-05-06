@@ -13,9 +13,13 @@
         style="cursor: pointer"
         @click="loadMessages(room.roomId)"
       >
-        <div class="list-group-item list-group-item-action room-name">
-          {{ room.name }} {{ room.unreadMessagesCount }}
-          <!-- 樣式調整及零不顯示 -->
+        <div
+          class="list-group-item list-group-item-action room-name d-flex justify-content-between"
+        >
+          <span>{{ room.name }} </span>
+          <span class="unread-badge" v-if="room.unreadMessagesCount > 0">{{
+            room.unreadMessagesCount
+          }}</span>
         </div>
         <!-- <div class="room-type">
           {{ room.type === "PRIVATE" ? "私人聊天室" : "群組聊天室" }}
@@ -122,7 +126,7 @@ const loadChatRooms = async () => {
 
     chatRooms.value = response.data;
   } catch (e) {
-    console.error("Error loading chat rooms", error);
+    console.error("Error loading chat rooms", e);
   }
 };
 
@@ -137,7 +141,7 @@ const loadMessages = async (roomId) => {
 
     currentChatRoom.value = response.data;
   } catch (e) {
-    console.error("Error loading chat room description", error);
+    console.error("Error loading chat room description", e);
   }
 
   try {
@@ -153,8 +157,12 @@ const loadMessages = async (roomId) => {
 
     messages.value = response2.data;
   } catch (e) {
-    console.error("Error loading chat room messages", error);
+    console.error("Error loading chat room messages", e);
   }
+
+  // update unread message count 0
+  const room = chatRooms.value.find((r) => r.roomId === roomId);
+  if (room) room.unreadMessagesCount = 0;
 };
 
 const formatTime = (timeStr) => {
@@ -337,5 +345,23 @@ watch(currentChatRoom, (currentChatRoom) => {
 
 .send-btn {
   width: 70px;
+}
+
+.unread-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+
+  background-color: red;
+  color: white;
+
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: bold;
+  line-height: 1;
 }
 </style>

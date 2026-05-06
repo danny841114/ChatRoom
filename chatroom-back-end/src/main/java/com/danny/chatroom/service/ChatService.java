@@ -94,6 +94,11 @@ public class ChatService {
     public List<ChatMessageResponse> getMessages(Long roomId, Long userId) {
         checkRoomMember(roomId, userId);
 
+        // update last read time
+        ChatRoomMember chatRoomMember = chatRoomMemberRepository.findByChatRoomIdAndUserId(roomId, userId);
+        chatRoomMember.setLastReadAt(LocalDateTime.now());
+        chatRoomMemberRepository.save(chatRoomMember);
+
         return chatMessageRepository.findByChatRoomIdOrderByCreatedAtAsc(roomId)
                 .stream()
                 .map(this::toMessageResponse)
@@ -154,6 +159,7 @@ public class ChatService {
             chatRoomMember.setUser(user);
             chatRoomMember.setChatRoom(newChatRoom);
             chatRoomMember.setJoinedAt(now);
+            chatRoomMember.setLastReadAt(now);
 
             chatRoomMembers.add(chatRoomMember);
         }
