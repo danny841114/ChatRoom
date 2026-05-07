@@ -5,15 +5,15 @@
 
       <div class="input-group mb-3">
         <span class="input-group-text">型別</span>
-        <select v-model="form.type" class="form-control">
+        <select v-model="roomType" class="form-control">
           <option value="PRIVATE">PRIVATE</option>
           <option value="GROUP">GROUP</option>
         </select>
       </div>
 
-      <div class="input-group mb-3" v-if="form.type === 'GROUP'">
+      <div class="input-group mb-3" v-if="roomType === 'GROUP'">
         <span class="input-group-text">名稱</span>
-        <input v-model="form.name" type="text" class="form-control" required />
+        <input v-model="roomName" type="text" class="form-control" required />
       </div>
 
       <div class="input-group mb-3">
@@ -21,9 +21,10 @@
 
         <select
           class="form-control"
-          @change="handlePrivateSelect"
-          v-if="form.type === 'PRIVATE'"
+          v-model="selectedPrivateUserId"
+          v-if="roomType === 'PRIVATE'"
         >
+          <option disabled :value="null">請選擇聊天對象</option>
           <option v-for="u in users" :key="u.id" :value="u.id">
             {{ u.username }} ({{ u.account }})
           </option>
@@ -31,8 +32,8 @@
 
         <select
           class="form-control"
-          v-model="form.memberIds"
-          v-if="form.type === 'GROUP'"
+          v-model="selectedPrivateUserIds"
+          v-if="roomType === 'GROUP'"
           multiple
         >
           <option v-for="u in users" :key="u.id" :value="u.id">
@@ -50,7 +51,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 import { useAuthStore } from "@/stores/auth";
 import axios from "axios";
 
@@ -58,11 +59,18 @@ const apiBase = import.meta.env.VITE_API_BASE_URL;
 const emit = defineEmits(["close", "created"]);
 const authStore = useAuthStore();
 const users = ref([]);
-const form = ref({
-  name: null,
-  type: "PRIVATE",
-  memberIds: [],
-});
+
+const roomName = ref(null);
+const roomType = ref("PRIVATE");
+const selectedPrivateUserId = ref(null);
+const selectedPrivateUserIds = ref([]);
+
+watch(
+  () => roomType.value,
+  (currentType) => {
+    if (currentType === "PRIVATE") roomName.value = null;
+  },
+);
 
 const loadUsers = async () => {
   try {
@@ -76,19 +84,25 @@ const loadUsers = async () => {
   }
 };
 
-const handlePrivateSelect = (e) => {
-  form.value.memberIds = [Number(e.target.value)];
-};
-
 const createRoom = async () => {
   try {
+    let memberIds = null;
+    if (roomType.value === "PRIVATE") {
+      memberIds = [selectedPrivateUserId.value];
+    } else {
+      memberIds = selectedPrivateUserIds.value;
+    }
+
     await axios.post(
       `${apiBase}/api/chat/rooms`,
-
-      form.value,
+      {
+        name: roomName.value,
+        type: roomType.value,
+        memberIds: memberIds,
+      },
       {
         params: { userId: authStore.userId },
-      }
+      },
     );
 
     emit("created");

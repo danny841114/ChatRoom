@@ -153,56 +153,58 @@ public class ChatService {
         return chatRoomMemberRepository.findByChatRoomId(roomId);
     }
 
-    public ChatRoomResponse addChatRoom(Long userId, AddChatRoomRequest addChatRoomRequest) {
+    public ChatRoomResponse addChatRoom(Long userId,
+                                        AddChatRoomRequest addChatRoomRequest) {
+        Set<Long> memberIds = addChatRoomRequest.getMemberIds();
+        String type = addChatRoomRequest.getType();
+
+        if ("PRIVATE".equals(type)) {
+            Long targetUserId = memberIds.iterator().next(); // get next factor
+
+            List<ChatRoom> privateRooms = chatRoomMemberRepository.findPrivateRoomsByUserId(userId);
+
+            for (ChatRoom room : privateRooms) {
+                List<ChatRoomMember> members = room.getMembers();   // two ChatRoomMember object
+
+                boolean existed = room.getMembers().stream()
+                        .anyMatch(m -> m.getUser().getId().equals(targetUserId));
+
+                if (existed) {
+                    System.err.println("有重複的私人聊天室");
+                    List<ChatRoomResponse.User> users = members.stream()
+                            .map(c -> {
+                                User user = c.getUser();
+                                return new ChatRoomResponse.User(
+                                        user.getId(),
+                                        user.getAccount(),
+                                        user.getUsername()
+                                );
+                            })
+                            .toList();
+
+                    return new ChatRoomResponse(
+                            room.getId(),
+                            room.getName(),
+                            room.getType(),
+                            0L,
+                            users
+                    );
+                }
+            }
+        }
+
+        System.err.println("沒有重複的私人聊天室");
+
         LocalDateTime now = LocalDateTime.now();
 
         ChatRoom newChatRoom = new ChatRoom();
         newChatRoom.setName(addChatRoomRequest.getName());
-        newChatRoom.setType(addChatRoomRequest.getType());
+        newChatRoom.setType(type);
         newChatRoom.setCreatedAt(now);
         newChatRoom.setLastMessageTime(now);
         chatRoomRepository.save(newChatRoom);
 
         List<ChatRoomMember> chatRoomMembers = new ArrayList<>();
-
-        Set<Long> memberIds = addChatRoomRequest.getMemberIds();
-
-        // 這邊邏輯要修
-//        if (memberIds.size() == 1) {
-//            List<Long> memberIdList = new ArrayList<>(memberIds);
-//            List<ChatRoom> privateRooms = chatRoomMemberRepository.findPrivateRoomsByUserId(userId);
-//            boolean result = false;
-//
-//            for (ChatRoom room : privateRooms) {
-//                List<ChatRoomMember> members = room.getMembers();
-//                for (ChatRoomMember chatRoomMember : members) {
-//                    Long userIdToCheck = chatRoomMember.getUser().getId();
-//
-//                    result = Objects.equals(userIdToCheck, memberIdList.get(0));
-//                    if (result) break;
-//                }
-//                if (result){
-//                    List<ChatRoomResponse.User> users = members
-//                            .stream()
-//                            .map(c -> {
-//                                User user = c.getUser();
-//                                return new ChatRoomResponse.User(
-//                                        user.getId(),
-//                                        user.getAccount(),
-//                                        user.getUsername()
-//                                );
-//                            })
-//                            .toList();
-//                    return new ChatRoomResponse(
-//                            newChatRoom.getId(),
-//                            newChatRoom.getName(),
-//                            newChatRoom.getType(),
-//                            0L,
-//                            users
-//                    );
-//                }
-//            }
-//        }
 
         memberIds.add(userId);
         for (Long memberId : memberIds) {
