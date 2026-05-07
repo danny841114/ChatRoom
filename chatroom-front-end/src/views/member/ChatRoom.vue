@@ -46,9 +46,24 @@
             'my-message': Number(msg.senderId) === Number(authStore.userId),
           }"
         >
-          <strong>{{ msg.senderName }} ({{ msg.senderAccount }}) :</strong>&nbsp;
+          <strong>{{ msg.senderName }} ({{ msg.senderAccount }}) :</strong
+          >&nbsp;
           <span v-if="!msg.deletedAt">{{ msg.content }}</span>
-          <span v-else style="color: gray;">--- 訊息已被刪除 ---</span>
+          <span v-else style="color: gray">--- 訊息已被刪除 ---</span>
+
+          <button
+            v-if="!msg.deletedAt && msg.senderId === Number(authStore.userId)"
+            class="message-menu-btn"
+            @click="toggleMenu(msg.messageId)"
+          >
+            ⋮
+          </button>
+          <div v-if="openedMenuId === msg.messageId" class="message-menu">
+            <button class="btn btn-danger" @click="recallMessage(msg.messageId)">
+              撤回訊息
+            </button>
+          </div>
+
           <div class="message-time">
             {{ formatTime(msg.createdAt) }}
           </div>
@@ -108,6 +123,7 @@ const message = ref("");
 const messages = ref([]);
 const showAddChatRoomModal = ref(false);
 const showChatRoomDetailModal = ref(false);
+const openedMenuId = ref(null);
 
 const isChatRoomIdEmpty = computed(() => {
   return (
@@ -132,6 +148,8 @@ const loadChatRooms = async () => {
 };
 
 const loadMessages = async (roomId) => {
+  openedMenuId.value = null;
+
   try {
     const response = await axios.get(`${apiBase}/api/chat/rooms/${roomId}`, {
       params: { userId: authStore.userId },
@@ -153,7 +171,7 @@ const loadMessages = async (roomId) => {
         headers: {
           Authorization: `Bearer ${authStore.token}`,
         },
-      },
+      }
     );
 
     messages.value = response2.data;
@@ -173,6 +191,34 @@ const formatTime = (timeStr) => {
     timeZone: "Asia/Taipei",
     hour12: false,
   });
+};
+
+const toggleMenu = (messageId) => {
+  openedMenuId.value = openedMenuId.value === messageId ? null : messageId;
+};
+
+const recallMessage = async (msgId) => {
+  try {
+    await axios.delete(
+      `${apiBase}/api/chat/rooms/${currentChatRoom.value.roomId}/messages`,
+      {
+        params: {
+          messageId: msgId,
+          userId: authStore.userId,
+        },
+        headers: {
+          Authorization: `Bearer ${authStore.token}`,
+        },
+      }
+    );
+
+    const msg = messages.value.find((m) => m.messageId === msgId);
+    if (msg) msg.deletedAt = "--- 訊息已被刪除 ---";
+  } catch (e) {
+    console.error("Error delete message", e);
+  }
+
+  openedMenuId.value = null;
 };
 
 const openModal = () => {
@@ -224,7 +270,7 @@ const subscribeRoom = (roomId) => {
     (messageBody) => {
       const newMessage = JSON.parse(messageBody.body);
       messages.value.push(newMessage);
-    },
+    }
   );
 };
 
@@ -236,7 +282,7 @@ const subscribeRoomList = () => {
     (messageBody) => {
       const updatedRooms = JSON.parse(messageBody.body);
       chatRooms.value = updatedRooms;
-    },
+    }
   );
 };
 
@@ -364,5 +410,22 @@ watch(currentChatRoom, (currentChatRoom) => {
   font-size: 12px;
   font-weight: bold;
   line-height: 1;
+}
+
+.message-menu-btn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+.message-menu {
+  position: absolute;
+  right: 0;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 6px;
+  /* z-index: 10; */
 }
 </style>

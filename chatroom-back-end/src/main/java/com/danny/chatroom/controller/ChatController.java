@@ -39,6 +39,19 @@ public class ChatController {
         return ResponseEntity.ok(messages);
     }
 
+    @DeleteMapping("/{roomId}/messages")
+    public ResponseEntity<?> deleteMessage(
+            @PathVariable Long roomId,
+            @RequestParam Long messageId,
+            @RequestParam Long userId) {
+        try {
+            chatService.deleteMessage(roomId, messageId, userId);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
     @PostMapping
     public ResponseEntity<ChatRoomResponse> addChatRoomAndUsers(@RequestParam Long userId,
                                                                 @RequestBody AddChatRoomRequest request) {

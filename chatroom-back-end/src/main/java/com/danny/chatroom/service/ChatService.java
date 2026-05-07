@@ -105,6 +105,17 @@ public class ChatService {
                 .toList();
     }
 
+    public void deleteMessage(Long roomId, Long messageId, Long userId) {
+        checkRoomMember(roomId, userId);
+
+        Optional<ChatMessage> messageOptional = chatMessageRepository.findById(messageId);
+        if (messageOptional.isEmpty()) throw new EntityNotFoundException("不存在此訊息");
+
+        ChatMessage chatMessage = messageOptional.get();
+        chatMessage.setDeletedAt(LocalDateTime.now());
+        chatMessageRepository.save(chatMessage);
+    }
+
     @Transactional
     public ChatMessageResponse sendMessage(Long roomId, SendMessageRequest request) {
         Long senderId = request.getSenderId();

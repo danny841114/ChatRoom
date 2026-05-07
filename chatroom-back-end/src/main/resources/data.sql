@@ -31,7 +31,7 @@ INSERT INTO chat_message (room_id, sender_id, content, created_at, deleted_at) V
 (1, 2, 'How are you?', '2026-04-29 10:05:00', '2026-04-29 10:06:00'),
 (1, 3, 'Anyone here into programming?', '2026-04-29 10:10:00', null),
 (2, 3, 'What’s the best Java framework?', '2026-04-29 10:15:00', null),
-(2, 1, 'Spring Boot is really popular right now.', '2026-04-29 10:20:00', '2026-04-29 10:21:00'),
+(2, 1, 'Spring Boot is really popular right now.', '2026-04-29 10:20:00', null),
 (3, 1, 'Hey Amy, how’s everything?', '2026-04-29 10:25:00', null),
 (3, 2, 'Hey Danny! All good, just been busy with work.', '2026-04-29 10:30:00', null),
 (4, 4, 'I need help with my account login.', '2026-04-29 10:35:00', null),
