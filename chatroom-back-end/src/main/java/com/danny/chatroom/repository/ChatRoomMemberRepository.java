@@ -1,5 +1,6 @@
 package com.danny.chatroom.repository;
 
+import com.danny.chatroom.entity.ChatRoom;
 import com.danny.chatroom.entity.ChatRoomMember;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -29,4 +30,12 @@ public interface ChatRoomMemberRepository extends JpaRepository<ChatRoomMember, 
                   AND m.deletedAt IS NULL
             """)
     Long countUnreadMessages(@Param("userId") Long userId, @Param("roomId") Long roomId);
+
+    @Query("""
+                SELECT DISTINCT crm.chatRoom
+                FROM ChatRoomMember crm
+                WHERE crm.user.id = :userId
+                  AND crm.chatRoom.type = 'PRIVATE'
+            """)
+    List<ChatRoom> findPrivateRoomsByUserId(Long userId);
 }

@@ -4,11 +4,6 @@
       <h5 class="text-center">新增聊天室</h5>
 
       <div class="input-group mb-3">
-        <span class="input-group-text">名稱</span>
-        <input v-model="form.name" type="text" class="form-control" required />
-      </div>
-
-      <div class="input-group mb-3">
         <span class="input-group-text">型別</span>
         <select v-model="form.type" class="form-control">
           <option value="PRIVATE">PRIVATE</option>
@@ -16,9 +11,30 @@
         </select>
       </div>
 
+      <div class="input-group mb-3" v-if="form.type === 'GROUP'">
+        <span class="input-group-text">名稱</span>
+        <input v-model="form.name" type="text" class="form-control" required />
+      </div>
+
       <div class="input-group mb-3">
         <span class="input-group-text">人員</span>
-        <select v-model="form.memberIds" multiple class="form-control">
+
+        <select
+          class="form-control"
+          @change="handlePrivateSelect"
+          v-if="form.type === 'PRIVATE'"
+        >
+          <option v-for="u in users" :key="u.id" :value="u.id">
+            {{ u.username }} ({{ u.account }})
+          </option>
+        </select>
+
+        <select
+          class="form-control"
+          v-model="form.memberIds"
+          v-if="form.type === 'GROUP'"
+          multiple
+        >
           <option v-for="u in users" :key="u.id" :value="u.id">
             {{ u.username }} ({{ u.account }})
           </option>
@@ -43,7 +59,7 @@ const emit = defineEmits(["close", "created"]);
 const authStore = useAuthStore();
 const users = ref([]);
 const form = ref({
-  name: "",
+  name: null,
   type: "PRIVATE",
   memberIds: [],
 });
@@ -60,6 +76,10 @@ const loadUsers = async () => {
   }
 };
 
+const handlePrivateSelect = (e) => {
+  form.value.memberIds = [Number(e.target.value)];
+};
+
 const createRoom = async () => {
   try {
     await axios.post(
@@ -68,7 +88,7 @@ const createRoom = async () => {
       form.value,
       {
         params: { userId: authStore.userId },
-      },
+      }
     );
 
     emit("created");

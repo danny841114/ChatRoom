@@ -55,7 +55,7 @@ public class ChatController {
     @PostMapping
     public ResponseEntity<ChatRoomResponse> addChatRoomAndUsers(@RequestParam Long userId,
                                                                 @RequestBody AddChatRoomRequest request) {
-        ChatRoomResponse room = chatService.addChatRoomAndUsers(userId, request);
+        ChatRoomResponse room = chatService.addChatRoom(userId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(room);
     }
 

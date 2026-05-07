@@ -38,17 +38,6 @@ public class ChatService {
 
                     Long count = chatRoomMemberRepository.countUnreadMessages(userId, room.getId());
 
-                    List<ChatRoomResponse.User> users = room.getMembers()
-                            .stream()
-                            .map(m ->
-                                    new ChatRoomResponse.User(
-                                            m.getUser().getId(),
-                                            m.getUser().getAccount(),
-                                            m.getUser().getUsername()
-                                    )
-                            )
-                            .toList();
-
                     if (room.getName() == null) {
                         ChatRoomMember c = room.getMembers().stream()
                                 .filter(m -> !Objects.equals(m.getUser().getId(), userId))
@@ -62,7 +51,7 @@ public class ChatService {
                             room.getName(),
                             room.getType(),
                             count,
-                            users
+                            null
                     );
                 })
                 .toList();
@@ -164,7 +153,7 @@ public class ChatService {
         return chatRoomMemberRepository.findByChatRoomId(roomId);
     }
 
-    public ChatRoomResponse addChatRoomAndUsers(Long userId, AddChatRoomRequest addChatRoomRequest) {
+    public ChatRoomResponse addChatRoom(Long userId, AddChatRoomRequest addChatRoomRequest) {
         LocalDateTime now = LocalDateTime.now();
 
         ChatRoom newChatRoom = new ChatRoom();
@@ -177,6 +166,44 @@ public class ChatService {
         List<ChatRoomMember> chatRoomMembers = new ArrayList<>();
 
         Set<Long> memberIds = addChatRoomRequest.getMemberIds();
+
+        // 這邊邏輯要修
+//        if (memberIds.size() == 1) {
+//            List<Long> memberIdList = new ArrayList<>(memberIds);
+//            List<ChatRoom> privateRooms = chatRoomMemberRepository.findPrivateRoomsByUserId(userId);
+//            boolean result = false;
+//
+//            for (ChatRoom room : privateRooms) {
+//                List<ChatRoomMember> members = room.getMembers();
+//                for (ChatRoomMember chatRoomMember : members) {
+//                    Long userIdToCheck = chatRoomMember.getUser().getId();
+//
+//                    result = Objects.equals(userIdToCheck, memberIdList.get(0));
+//                    if (result) break;
+//                }
+//                if (result){
+//                    List<ChatRoomResponse.User> users = members
+//                            .stream()
+//                            .map(c -> {
+//                                User user = c.getUser();
+//                                return new ChatRoomResponse.User(
+//                                        user.getId(),
+//                                        user.getAccount(),
+//                                        user.getUsername()
+//                                );
+//                            })
+//                            .toList();
+//                    return new ChatRoomResponse(
+//                            newChatRoom.getId(),
+//                            newChatRoom.getName(),
+//                            newChatRoom.getType(),
+//                            0L,
+//                            users
+//                    );
+//                }
+//            }
+//        }
+
         memberIds.add(userId);
         for (Long memberId : memberIds) {
             User user = userRepository.findById(memberId)
