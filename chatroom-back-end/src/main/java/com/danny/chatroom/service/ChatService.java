@@ -209,13 +209,13 @@ public class ChatService {
         return new ChatMessageResponse(
                 message.getId(),
                 message.getChatRoom().getId(),
-                message.getChatRoom().getName(),
                 message.getSender().getId(),
                 message.getSender().getUsername(),
                 message.getSender().getAccount(),
                 message.getContent(),
                 message.getMessageType(),
-                message.getCreatedAt()
+                message.getCreatedAt(),
+                message.getDeletedAt()
         );
     }
 }

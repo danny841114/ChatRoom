@@ -25,16 +25,16 @@ INSERT INTO chat_room_member (room_id, user_id, joined_at, last_read_at) VALUES
 (5, 5, '2026-04-29 10:45:00', '2026-04-30 10:00:00'), -- Gaming: Eva
 (5, 2, '2026-04-29 10:50:00', '2026-04-30 10:00:00'); -- Gaming: Amy
 
-INSERT INTO chat_message (room_id, sender_id, content, created_at) VALUES
-(1, 1, 'Hello everyone!', '2026-04-29 10:00:00'),
-(1, 2, 'Hi Danny!', '2026-04-29 10:05:00'),
-(1, 2, 'How are you?', '2026-04-29 10:05:00'),
-(1, 3, 'Anyone here into programming?', '2026-04-29 10:10:00'),
-(2, 3, 'What’s the best Java framework?', '2026-04-29 10:15:00'),
-(2, 1, 'Spring Boot is really popular right now.', '2026-04-29 10:20:00'),
-(3, 1, 'Hey Amy, how’s everything?', '2026-04-29 10:25:00'),
-(3, 2, 'Hey Danny! All good, just been busy with work.', '2026-04-29 10:30:00'),
-(4, 4, 'I need help with my account login.', '2026-04-29 10:35:00'),
-(4, 5, 'I can assist you with that. What seems to be the problem?', '2026-04-29 10:40:00'),
-(5, 5, 'Who’s playing the new game?', '2026-04-29 10:45:00'),
-(5, 2, 'I am! Let’s team up!', '2026-04-29 10:50:00');
+INSERT INTO chat_message (room_id, sender_id, content, created_at, deleted_at) VALUES
+(1, 1, 'Hello everyone!', '2026-04-29 10:00:00', null),
+(1, 2, 'Hi Danny!', '2026-04-29 10:05:00', null),
+(1, 2, 'How are you?', '2026-04-29 10:05:00', '2026-04-29 10:06:00'),
+(1, 3, 'Anyone here into programming?', '2026-04-29 10:10:00', null),
+(2, 3, 'What’s the best Java framework?', '2026-04-29 10:15:00', null),
+(2, 1, 'Spring Boot is really popular right now.', '2026-04-29 10:20:00', '2026-04-29 10:21:00'),
+(3, 1, 'Hey Amy, how’s everything?', '2026-04-29 10:25:00', null),
+(3, 2, 'Hey Danny! All good, just been busy with work.', '2026-04-29 10:30:00', null),
+(4, 4, 'I need help with my account login.', '2026-04-29 10:35:00', null),
+(4, 5, 'I can assist you with that. What seems to be the problem?', '2026-04-29 10:40:00', null),
+(5, 5, 'Who’s playing the new game?', '2026-04-29 10:45:00', null),
+(5, 2, 'I am! Let’s team up!', '2026-04-29 10:50:00', null);

@@ -26,6 +26,7 @@ public interface ChatRoomMemberRepository extends JpaRepository<ChatRoomMember, 
                   AND rm.chatRoom.id = :roomId
                   AND m.createdAt > rm.lastReadAt
                   AND m.sender.id <> :userId
+                  AND m.deletedAt IS NULL
             """)
     Long countUnreadMessages(@Param("userId") Long userId, @Param("roomId") Long roomId);
 }
