@@ -8,7 +8,7 @@ INSERT INTO users (account, username, password, created_at) VALUES
 INSERT INTO chat_room (name, type, created_at, last_message_time) VALUES
 ('General Chat', 'GROUP', '2026-04-29 09:30:00', '2026-04-29 10:10:00'),
 ('Tech Talk', 'GROUP', '2026-04-29 09:35:00','2026-04-29 10:20:00'),
-('Danny & Amy', 'PRIVATE', '2026-04-29 09:40:00', '2026-04-29 10:30:00'),
+(null, 'PRIVATE', '2026-04-29 09:40:00', '2026-04-29 10:30:00'),
 ('Support', 'GROUP', '2026-04-29 09:45:00', '2026-04-29 10:40:00'),
 ('Gaming', 'GROUP', '2026-04-29 09:50:00', '2026-04-29 10:50:00');
 

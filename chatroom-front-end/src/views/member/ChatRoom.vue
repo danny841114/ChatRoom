@@ -16,14 +16,16 @@
         <div
           class="list-group-item list-group-item-action room-name d-flex justify-content-between"
         >
-          <span>{{ room.name }} </span>
+          <span>
+            <strong class="type-badge">{{
+              room.type === "PRIVATE" ? "私" : "群"
+            }}</strong>
+            {{ room.name }}
+          </span>
           <span class="unread-badge" v-if="room.unreadMessagesCount > 0">{{
             room.unreadMessagesCount
           }}</span>
         </div>
-        <!-- <div class="room-type">
-          {{ room.type === "PRIVATE" ? "私人聊天室" : "群組聊天室" }}
-        </div> -->
       </div>
     </aside>
 
@@ -59,7 +61,10 @@
             ⋮
           </button>
           <div v-if="openedMenuId === msg.messageId" class="message-menu">
-            <button class="btn btn-danger" @click="recallMessage(msg.messageId)">
+            <button
+              class="btn btn-danger"
+              @click="recallMessage(msg.messageId)"
+            >
               撤回訊息
             </button>
           </div>
@@ -404,6 +409,24 @@ watch(currentChatRoom, (currentChatRoom) => {
   padding: 0 6px;
 
   background-color: red;
+  color: white;
+
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: bold;
+  line-height: 1;
+}
+
+.type-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+
+  background-color: green;
   color: white;
 
   border-radius: 999px;

@@ -18,7 +18,7 @@ public class ChatRoom {
 
     private String name;
 
-    private String type; // PRIVATE / GROUP
+    private String type;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;

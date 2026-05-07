@@ -49,6 +49,14 @@ public class ChatService {
                             )
                             .toList();
 
+                    if (room.getName() == null) {
+                        ChatRoomMember c = room.getMembers().stream()
+                                .filter(m -> !Objects.equals(m.getUser().getId(), userId))
+                                .toList()
+                                .get(0);
+                        room.setName(c.getUser().getUsername());
+                    }
+
                     return new ChatRoomResponse(
                             room.getId(),
                             room.getName(),
@@ -79,6 +87,14 @@ public class ChatService {
                             )
                     )
                     .toList();
+
+            if (chatRoom.getName() == null) {
+                ChatRoomMember chatRoomMember = chatRoom.getMembers().stream()
+                        .filter(m -> !Objects.equals(m.getUser().getId(), userId))
+                        .toList()
+                        .get(0);
+                chatRoom.setName(chatRoomMember.getUser().getUsername());
+            }
 
             return new ChatRoomResponse(
                     chatRoom.getId(),
