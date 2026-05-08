@@ -38,7 +38,7 @@ public class ChatService {
 
                     Long count = chatRoomMemberRepository.countUnreadMessages(userId, room.getId());
 
-                    if (room.getName() == null) {
+                    if ("PRIVATE".equals(room.getType())) {
                         ChatRoomMember c = room.getMembers().stream()
                                 .filter(m -> !Objects.equals(m.getUser().getId(), userId))
                                 .toList()
@@ -77,7 +77,7 @@ public class ChatService {
                     )
                     .toList();
 
-            if (chatRoom.getName() == null) {
+            if ("PRIVATE".equals(chatRoom.getType())) {
                 ChatRoomMember chatRoomMember = chatRoom.getMembers().stream()
                         .filter(m -> !Objects.equals(m.getUser().getId(), userId))
                         .toList()

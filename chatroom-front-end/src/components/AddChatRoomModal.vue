@@ -69,7 +69,7 @@ watch(
   () => roomType.value,
   (currentType) => {
     if (currentType === "PRIVATE") roomName.value = null;
-  },
+  }
 );
 
 const loadUsers = async () => {
@@ -86,6 +86,11 @@ const loadUsers = async () => {
 
 const createRoom = async () => {
   try {
+    if (roomType.value === "GROUP" && roomName.value === null) {
+      console.log("Type 'GROUP' but name null");
+      return;
+    }
+
     let memberIds = null;
     if (roomType.value === "PRIVATE") {
       memberIds = [selectedPrivateUserId.value];
@@ -93,7 +98,7 @@ const createRoom = async () => {
       memberIds = selectedPrivateUserIds.value;
     }
 
-    await axios.post(
+    const response = await axios.post(
       `${apiBase}/api/chat/rooms`,
       {
         name: roomName.value,
@@ -102,8 +107,13 @@ const createRoom = async () => {
       },
       {
         params: { userId: authStore.userId },
-      },
+      }
     );
+
+    
+
+    roomName.value = null;
+    selectedPrivateUserIds.value = [];
 
     emit("created");
   } catch (e) {
