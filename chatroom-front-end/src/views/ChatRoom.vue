@@ -94,11 +94,11 @@
     </main>
   </div>
 
-  <AddChatRoomModal
+  <AddChatRoom
     v-show="showAddChatRoomModal"
     @close="showAddChatRoomModal = false"
     @created="handleCreated"
-  ></AddChatRoomModal>
+  ></AddChatRoom>
 
   <ChatRoomDetail
     v-show="showChatRoomDetailModal"
@@ -113,7 +113,7 @@ import { Client } from "@stomp/stompjs";
 import { useAuthStore } from "@/stores/auth";
 import SockJS from "sockjs-client";
 import axios from "axios";
-import AddChatRoomModal from "@/components/AddChatRoomModal.vue";
+import AddChatRoom from "@/components/AddChatRoom.vue";
 import ChatRoomDetail from "@/components/ChatRoomDetail.vue";
 
 const apiBase = import.meta.env.VITE_API_BASE_URL;
@@ -176,7 +176,7 @@ const loadMessages = async (roomId) => {
         headers: {
           Authorization: `Bearer ${authStore.token}`,
         },
-      }
+      },
     );
 
     messages.value = response2.data;
@@ -214,7 +214,7 @@ const recallMessage = async (msgId) => {
         headers: {
           Authorization: `Bearer ${authStore.token}`,
         },
-      }
+      },
     );
 
     const msg = messages.value.find((m) => m.messageId === msgId);
@@ -275,7 +275,7 @@ const subscribeRoom = (roomId) => {
     (messageBody) => {
       const newMessage = JSON.parse(messageBody.body);
       messages.value.push(newMessage);
-    }
+    },
   );
 };
 
@@ -287,7 +287,7 @@ const subscribeRoomList = () => {
     (messageBody) => {
       const updatedRooms = JSON.parse(messageBody.body);
       chatRooms.value = updatedRooms;
-    }
+    },
   );
 };
 
