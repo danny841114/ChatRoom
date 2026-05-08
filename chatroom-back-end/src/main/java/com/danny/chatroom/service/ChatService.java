@@ -170,30 +170,16 @@ public class ChatService {
                         .anyMatch(m -> m.getUser().getId().equals(targetUserId));
 
                 if (existed) {
-                    System.err.println("有重複的私人聊天室");
-                    List<ChatRoomResponse.User> users = members.stream()
-                            .map(c -> {
-                                User user = c.getUser();
-                                return new ChatRoomResponse.User(
-                                        user.getId(),
-                                        user.getAccount(),
-                                        user.getUsername()
-                                );
-                            })
-                            .toList();
-
                     return new ChatRoomResponse(
                             room.getId(),
                             room.getName(),
                             room.getType(),
                             0L,
-                            users
+                            null
                     );
                 }
             }
         }
-
-        System.err.println("沒有重複的私人聊天室");
 
         LocalDateTime now = LocalDateTime.now();
 
@@ -221,24 +207,12 @@ public class ChatService {
         }
         chatRoomMemberRepository.saveAll(chatRoomMembers);
 
-        List<ChatRoomResponse.User> users = chatRoomMembers
-                .stream()
-                .map(chatRoomMember -> {
-                    User user = chatRoomMember.getUser();
-                    return new ChatRoomResponse.User(
-                            user.getId(),
-                            user.getAccount(),
-                            user.getUsername()
-                    );
-                })
-                .toList();
-
         return new ChatRoomResponse(
                 newChatRoom.getId(),
                 newChatRoom.getName(),
                 newChatRoom.getType(),
                 0L,
-                users
+                null
         );
     }
 

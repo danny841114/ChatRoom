@@ -69,7 +69,7 @@ watch(
   () => roomType.value,
   (currentType) => {
     if (currentType === "PRIVATE") roomName.value = null;
-  }
+  },
 );
 
 const loadUsers = async () => {
@@ -107,15 +107,13 @@ const createRoom = async () => {
       },
       {
         params: { userId: authStore.userId },
-      }
+      },
     );
-
-    
 
     roomName.value = null;
     selectedPrivateUserIds.value = [];
 
-    emit("created");
+    emit("created", response.data.roomId);
   } catch (e) {
     console.error("Error creating room", error);
   }

@@ -230,9 +230,10 @@ const openModal = () => {
   showAddChatRoomModal.value = true;
 };
 
-const handleCreated = () => {
+const handleCreated = (roomId) => {
   showAddChatRoomModal.value = false;
   loadChatRooms();
+  loadMessages(roomId);
 };
 
 const openChatRoomDetailModal = () => {
