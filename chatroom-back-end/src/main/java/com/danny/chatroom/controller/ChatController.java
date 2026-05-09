@@ -64,4 +64,21 @@ public class ChatController {
         List<UserResponse> users = chatService.getUsersExceptMe(userId);
         return ResponseEntity.ok(users);
     }
+
+    @DeleteMapping("/{roomId}/user/{deleteUserId}")
+    public ResponseEntity<Void> deleteChatRoomUser(@PathVariable Long roomId,
+                                                   @PathVariable Long deleteUserId,
+                                                   @RequestParam Long userId) {
+        chatService.deleteChatRoomUser(roomId, deleteUserId, userId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{roomId}/user/{addUserId}")
+    public ResponseEntity<Void> addChatRoomUser(@PathVariable Long roomId,
+                                                @PathVariable Long addUserId,
+                                                @RequestParam Long userId) {
+        //TODO new service method
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(null);
+    }
 }

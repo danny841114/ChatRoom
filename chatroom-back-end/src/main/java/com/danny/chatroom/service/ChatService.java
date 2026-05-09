@@ -17,6 +17,8 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -227,6 +229,13 @@ public class ChatService {
                         user.getAccount(),
                         user.getUsername()))
                 .toList();
+    }
+
+    public void deleteChatRoomUser(Long roomId, Long deleteUserId, Long userId) {
+        checkRoomMember(roomId, userId);
+        checkRoomMember(roomId, deleteUserId);
+
+        chatRoomMemberRepository.deleteByChatRoomIdAndUserId(roomId, deleteUserId);
     }
 
     private void checkRoomMember(Long roomId, Long userId) {

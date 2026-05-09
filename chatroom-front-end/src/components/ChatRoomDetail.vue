@@ -10,12 +10,21 @@
           :key="u.id"
         >
           <span>{{ u.account }} ({{ u.username }})</span>
-          <button class="btn btn-danger">移除</button>
+          <button
+            class="btn btn-danger"
+            v-if="chatRoom.type === 'GROUP'"
+            @click="deleteMember(u.id)"
+          >
+            移除
+          </button>
         </li>
       </ul>
 
       <div class="mt-3 text-center">
-        <button class="btn btn-primary">新增</button>&nbsp;
+        <button class="btn btn-primary" v-if="chatRoom.type === 'GROUP'">
+          新增
+        </button>
+        &nbsp;
         <button class="btn btn-primary" @click="$emit('close')">關閉</button>
       </div>
     </div>
@@ -23,16 +32,18 @@
 </template>
 
 <script setup>
-// import { ref, onMounted, defineProps } from "vue";
-// import { useAuthStore } from "@/stores/auth";
-// import axios from "axios";
+import { ref } from "vue";
+import { useAuthStore } from "@/stores/auth";
+import axios from "axios";
 
-// const apiBase = import.meta.env.VITE_API_BASE_URL;
+const apiBase = import.meta.env.VITE_API_BASE_URL;
 const emit = defineEmits(["close", "created"]);
-// const authStore = useAuthStore();
+const authStore = useAuthStore();
 const props = defineProps({
   chatRoom: Object,
 });
+
+const deleteMember = (userId) => {};
 </script>
 
 <style scoped>

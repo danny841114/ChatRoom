@@ -48,8 +48,8 @@
             'my-message': Number(msg.senderId) === Number(authStore.userId),
           }"
         >
-          <strong>{{ msg.senderName }} ({{ msg.senderAccount }}) :</strong
-          >&nbsp;
+          <strong>{{ msg.senderName }} ({{ msg.senderAccount }}) :</strong>
+          &nbsp;
           <span v-if="!msg.deletedAt">{{ msg.content }}</span>
           <span v-else style="color: gray">--- 訊息已被刪除 ---</span>
 
@@ -122,6 +122,7 @@ const chatRooms = ref([]);
 const currentChatRoom = ref({
   roomId: "",
   name: "",
+  type: "",
   users: [],
 });
 const message = ref("");
