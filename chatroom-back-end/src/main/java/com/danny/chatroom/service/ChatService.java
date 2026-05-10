@@ -3,6 +3,7 @@ package com.danny.chatroom.service;
 import com.danny.chatroom.dto.request.AddChatRoomRequest;
 import com.danny.chatroom.dto.request.SendMessageRequest;
 import com.danny.chatroom.dto.response.ChatMessageResponse;
+import com.danny.chatroom.dto.response.ChatRoomMemberResponse;
 import com.danny.chatroom.dto.response.ChatRoomResponse;
 import com.danny.chatroom.dto.response.UserResponse;
 import com.danny.chatroom.entity.ChatMessage;
@@ -17,8 +18,6 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -236,6 +235,27 @@ public class ChatService {
         checkRoomMember(roomId, deleteUserId);
 
         chatRoomMemberRepository.deleteByChatRoomIdAndUserId(roomId, deleteUserId);
+    }
+
+    public ChatRoomMemberResponse addChatRoomUser(Long roomId, Long addUserId, Long userId) {
+        checkRoomMember(roomId, userId);
+
+        ChatRoom chatRoom = chatRoomRepository.findById(roomId)
+                .orElseThrow(() -> (new EntityNotFoundException("無此聊天是")));
+
+        User user = userRepository.findById(addUserId)
+                .orElseThrow(() -> (new EntityNotFoundException("無此使用者")));
+
+        LocalDateTime now = LocalDateTime.now();
+
+        ChatRoomMember chatRoomMember = new ChatRoomMember();
+        chatRoomMember.setChatRoom(chatRoom);
+        chatRoomMember.setUser(user);
+        chatRoomMember.setJoinedAt(now);
+        chatRoomMember.setLastReadAt(now);
+        chatRoomMemberRepository.save(chatRoomMember);
+
+        return new ChatRoomMemberResponse(roomId, addUserId, now, now);
     }
 
     private void checkRoomMember(Long roomId, Long userId) {

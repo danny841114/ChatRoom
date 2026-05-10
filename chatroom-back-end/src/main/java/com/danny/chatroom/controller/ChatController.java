@@ -2,6 +2,7 @@ package com.danny.chatroom.controller;
 
 import com.danny.chatroom.dto.request.AddChatRoomRequest;
 import com.danny.chatroom.dto.response.ChatMessageResponse;
+import com.danny.chatroom.dto.response.ChatRoomMemberResponse;
 import com.danny.chatroom.dto.response.ChatRoomResponse;
 import com.danny.chatroom.dto.response.UserResponse;
 import com.danny.chatroom.service.ChatService;
@@ -74,11 +75,10 @@ public class ChatController {
     }
 
     @PostMapping("/{roomId}/user/{addUserId}")
-    public ResponseEntity<Void> addChatRoomUser(@PathVariable Long roomId,
-                                                @PathVariable Long addUserId,
-                                                @RequestParam Long userId) {
-        //TODO new service method
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(null);
+    public ResponseEntity<ChatRoomMemberResponse> addChatRoomUser(@PathVariable Long roomId,
+                                                                  @PathVariable Long addUserId,
+                                                                  @RequestParam Long userId) {
+        ChatRoomMemberResponse chatRoomMemberResponse = chatService.addChatRoomUser(roomId, addUserId, userId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(chatRoomMemberResponse);
     }
 }
