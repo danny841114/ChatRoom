@@ -230,6 +230,7 @@ public class ChatService {
                 .toList();
     }
 
+    @Transactional
     public void deleteChatRoomUser(Long roomId, Long deleteUserId, Long userId) {
         checkRoomMember(roomId, userId);
         checkRoomMember(roomId, deleteUserId);

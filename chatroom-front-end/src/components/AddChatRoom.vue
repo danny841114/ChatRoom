@@ -80,7 +80,7 @@ const loadUsers = async () => {
 
     users.value = response.data;
   } catch (e) {
-    console.error("Error loading users", error);
+    console.error("Error loading users", e);
   }
 };
 
@@ -115,7 +115,7 @@ const createRoom = async () => {
 
     emit("created", response.data.roomId);
   } catch (e) {
-    console.error("Error creating room", error);
+    console.error("Error creating room", e);
   }
 };
 

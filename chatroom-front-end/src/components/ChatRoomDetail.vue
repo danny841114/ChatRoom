@@ -32,9 +32,9 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
 import { useAuthStore } from "@/stores/auth";
 import axios from "axios";
+import Swal from "sweetalert2";
 
 const apiBase = import.meta.env.VITE_API_BASE_URL;
 const emit = defineEmits(["close", "created"]);
@@ -43,7 +43,35 @@ const props = defineProps({
   chatRoom: Object,
 });
 
-const deleteMember = (userId) => {};
+const deleteMember = async (userId) => {
+  const ask = await Swal.fire({
+    title: "移除聊天室成員",
+    icon: "warning",
+    text: `確定移除${userId}?`,
+    showCancelButton: true,
+    confirmButtonText: "確定",
+    cancelButtonText: "返回",
+  });
+
+  if (!ask.isConfirmed) return;
+
+  try {
+    const response = await axios.delete(
+      `${apiBase}/api/chat/rooms/${props.chatRoom.roomId}/user/${userId}`,
+      {
+        params: { userId: authStore.userId },
+      },
+    );
+
+    if (response.status === 204) {
+      const index = props.chatRoom.users.findIndex((u) => u.id === userId);
+
+      if (index !== -1) props.chatRoom.users.splice(index, 1);
+    }
+  } catch (e) {
+    console.error("Error delete member from chat room", e);
+  }
+};
 </script>
 
 <style scoped>
