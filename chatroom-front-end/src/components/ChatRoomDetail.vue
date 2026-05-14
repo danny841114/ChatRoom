@@ -10,11 +10,11 @@
           v-for="u in props.chatRoom.users"
           :key="u.id"
         >
-          <span>{{ u.account }} ({{ u.username }})</span>
+          <span>{{ u.username }} ({{ u.account }})</span>
           <button
             class="btn btn-danger"
             v-if="chatRoom.type === 'GROUP'"
-            @click="deleteMember(u.id)"
+            @click="deleteMember(u.id, u.username, u.account)"
           >
             移除
           </button>
@@ -72,11 +72,11 @@ const mode = ref("detail");
 const usersForAdding = ref([]);
 const selectedUserIds = ref([]);
 
-const deleteMember = async (userId) => {
+const deleteMember = async (userId, username, account) => {
   const ask = await Swal.fire({
     title: "移除聊天室成員",
     icon: "warning",
-    text: `確定移除${userId}?`,
+    text: `確定移除 ${username}(${account}) ?`,
     showCancelButton: true,
     confirmButtonText: "確定",
     cancelButtonText: "返回",
@@ -89,7 +89,7 @@ const deleteMember = async (userId) => {
       `${apiBase}/api/chat/rooms/${props.chatRoom.roomId}/user/${userId}`,
       {
         params: { userId: authStore.userId },
-      }
+      },
     );
 
     if (response.status === 204) {
@@ -127,7 +127,7 @@ const addChatRoomMember = async () => {
       },
       {
         params: { userId: authStore.userId },
-      }
+      },
     );
 
     selectedUserIds.value = [];

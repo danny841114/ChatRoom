@@ -74,8 +74,8 @@ public class ChatService {
                     .map(m ->
                             new ChatRoomResponse.User(
                                     m.getUser().getId(),
-                                    m.getUser().getAccount(),
-                                    m.getUser().getUsername()
+                                    m.getUser().getUsername(),
+                                    m.getUser().getAccount()
                             )
                     )
                     .toList();
