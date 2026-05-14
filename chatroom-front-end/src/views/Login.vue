@@ -82,10 +82,16 @@ const authStore = useAuthStore();
 
 const handleLogin = async () => {
   try {
-    const response = await axios.post(`${apiBase}/api/auth/login`, {
-      account: account.value,
-      password: password.value,
-    });
+    const response = await axios.post(
+      `${apiBase}/api/auth/login`,
+      {
+        account: account.value,
+        password: password.value,
+      },
+      {
+        withCredentials: true,
+      },
+    );
 
     authStore.setLogin(response.data);
 
