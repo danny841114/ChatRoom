@@ -1,6 +1,7 @@
 <template>
   <div class="modal-backdrop-custom">
-    <div class="modal-content-custom">
+    <!-- 聊天室詳情 -->
+    <div class="modal-content-custom" v-if="mode === 'detail'">
       <h5 class="text-center">聊天室成員</h5>
 
       <ul class="list-group">
@@ -21,17 +22,42 @@
       </ul>
 
       <div class="mt-3 text-center">
-        <button class="btn btn-primary" v-if="chatRoom.type === 'GROUP'">
+        <button
+          class="btn btn-primary"
+          v-if="chatRoom.type === 'GROUP'"
+          @click="openAddMemberMode"
+        >
           新增
         </button>
         &nbsp;
         <button class="btn btn-primary" @click="$emit('close')">關閉</button>
       </div>
     </div>
+
+    <!-- 新增聊天室成員 -->
+    <div class="modal-content-custom" v-if="mode === 'addMember'">
+      <h5 class="text-center">新增成員</h5>
+
+      <div class="input-group mb-3">
+        <span class="input-group-text">人員</span>
+        <select class="form-control" v-model="selectedUserIds" multiple>
+          <option v-for="u in usersForAdding" :key="u.id" :value="u.id">
+            {{ u.username }} ({{ u.account }})
+          </option>
+        </select>
+      </div>
+
+      <div class="mt-3 text-center">
+        <button class="btn btn-primary" @click="addChatRoomMember">新增</button>
+        &nbsp;
+        <button class="btn btn-primary" @click="mode = 'detail'">取消</button>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
+import { ref } from "vue";
 import { useAuthStore } from "@/stores/auth";
 import axios from "axios";
 import Swal from "sweetalert2";
@@ -42,6 +68,9 @@ const authStore = useAuthStore();
 const props = defineProps({
   chatRoom: Object,
 });
+const mode = ref("detail");
+const usersForAdding = ref([]);
+const selectedUserIds = ref([]);
 
 const deleteMember = async (userId) => {
   const ask = await Swal.fire({
@@ -60,7 +89,7 @@ const deleteMember = async (userId) => {
       `${apiBase}/api/chat/rooms/${props.chatRoom.roomId}/user/${userId}`,
       {
         params: { userId: authStore.userId },
-      },
+      }
     );
 
     if (response.status === 204) {
@@ -71,6 +100,47 @@ const deleteMember = async (userId) => {
   } catch (e) {
     console.error("Error delete member from chat room", e);
   }
+};
+
+const getUsersExceptExistingMembers = async () => {
+  try {
+    console.log("props.chatRoom.roomId", props.chatRoom.roomId);
+    const response = await axios.get(`${apiBase}/api/chat/rooms/users/add`, {
+      params: {
+        roomId: props.chatRoom.roomId,
+        userId: authStore.userId,
+      },
+    });
+
+    usersForAdding.value = response.data;
+  } catch (e) {
+    console.error("Error loading users", e);
+  }
+};
+
+const addChatRoomMember = async () => {
+  try {
+    const response = await axios.post(
+      `${apiBase}/api/chat/rooms/${props.chatRoom.roomId}/users`,
+      {
+        userIds: selectedUserIds.value,
+      },
+      {
+        params: { userId: authStore.userId },
+      }
+    );
+
+    selectedUserIds.value = [];
+    mode.value = "detail";
+    emit("created");
+  } catch (e) {
+    console.error("Error creating room", e);
+  }
+};
+
+const openAddMemberMode = () => {
+  getUsersExceptExistingMembers();
+  mode.value = "addMember";
 };
 </script>
 

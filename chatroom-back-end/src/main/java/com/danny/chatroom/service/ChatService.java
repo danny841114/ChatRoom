@@ -1,6 +1,7 @@
 package com.danny.chatroom.service;
 
 import com.danny.chatroom.dto.request.AddChatRoomRequest;
+import com.danny.chatroom.dto.request.AddMemberRequest;
 import com.danny.chatroom.dto.request.SendMessageRequest;
 import com.danny.chatroom.dto.response.ChatMessageResponse;
 import com.danny.chatroom.dto.response.ChatRoomMemberResponse;
@@ -21,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -154,8 +156,8 @@ public class ChatService {
         return chatRoomMemberRepository.findByChatRoomId(roomId);
     }
 
-    public ChatRoomResponse addChatRoom(Long userId,
-                                        AddChatRoomRequest addChatRoomRequest) {
+    public ChatRoomResponse createChatRoom(Long userId,
+                                           AddChatRoomRequest addChatRoomRequest) {
         Set<Long> memberIds = addChatRoomRequest.getMemberIds();
         String type = addChatRoomRequest.getType();
 
@@ -230,6 +232,27 @@ public class ChatService {
                 .toList();
     }
 
+    // TODO 之後把過濾邏輯寫至Repository層
+    public List<UserResponse> getUsersExceptExistingMembers(Long roomId, Long userId) {
+        checkRoomMember(roomId, userId);
+
+        List<ChatRoomMember> chatRoomMembers = chatRoomMemberRepository.findByChatRoomId(roomId);
+        Set<Long> existingUserIds = chatRoomMembers.stream()
+                .map(x -> x.getUser().getId())
+                .collect(Collectors.toSet());
+
+        List<User> allUsers = userRepository.findAll();
+
+        return allUsers
+                .stream()
+                .filter(user -> !existingUserIds.contains(user.getId()))
+                .map(user -> new UserResponse(
+                        user.getId(),
+                        user.getAccount(),
+                        user.getUsername()))
+                .toList();
+    }
+
     @Transactional
     public void deleteChatRoomUser(Long roomId, Long deleteUserId, Long userId) {
         checkRoomMember(roomId, userId);
@@ -238,25 +261,32 @@ public class ChatService {
         chatRoomMemberRepository.deleteByChatRoomIdAndUserId(roomId, deleteUserId);
     }
 
-    public ChatRoomMemberResponse addChatRoomUser(Long roomId, Long addUserId, Long userId) {
+    public List<ChatRoomMemberResponse> addChatRoomUsers(Long roomId, AddMemberRequest request, Long userId) {
         checkRoomMember(roomId, userId);
 
         ChatRoom chatRoom = chatRoomRepository.findById(roomId)
-                .orElseThrow(() -> (new EntityNotFoundException("無此聊天是")));
+                .orElseThrow(() -> (new EntityNotFoundException("無此聊天室")));
 
-        User user = userRepository.findById(addUserId)
-                .orElseThrow(() -> (new EntityNotFoundException("無此使用者")));
+        List<ChatRoomMemberResponse> responses = new ArrayList<>();
+        List<Long> userIds = request.getUserIds();
+        for (Long addUserId : userIds) {
+            User user = userRepository.findById(addUserId)
+                    .orElseThrow(() -> (new EntityNotFoundException("無此使用者")));
 
-        LocalDateTime now = LocalDateTime.now();
+            LocalDateTime now = LocalDateTime.now();
 
-        ChatRoomMember chatRoomMember = new ChatRoomMember();
-        chatRoomMember.setChatRoom(chatRoom);
-        chatRoomMember.setUser(user);
-        chatRoomMember.setJoinedAt(now);
-        chatRoomMember.setLastReadAt(now);
-        chatRoomMemberRepository.save(chatRoomMember);
+            ChatRoomMember chatRoomMember = new ChatRoomMember();
+            chatRoomMember.setChatRoom(chatRoom);
+            chatRoomMember.setUser(user);
+            chatRoomMember.setJoinedAt(now);
+            chatRoomMember.setLastReadAt(now);
+            chatRoomMemberRepository.save(chatRoomMember);
 
-        return new ChatRoomMemberResponse(roomId, addUserId, now, now);
+            ChatRoomMemberResponse response = new ChatRoomMemberResponse(roomId, addUserId, now, now);
+            responses.add(response);
+        }
+
+        return responses;
     }
 
     private void checkRoomMember(Long roomId, Long userId) {

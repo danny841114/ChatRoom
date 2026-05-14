@@ -1,6 +1,7 @@
 package com.danny.chatroom.controller;
 
 import com.danny.chatroom.dto.request.AddChatRoomRequest;
+import com.danny.chatroom.dto.request.AddMemberRequest;
 import com.danny.chatroom.dto.response.ChatMessageResponse;
 import com.danny.chatroom.dto.response.ChatRoomMemberResponse;
 import com.danny.chatroom.dto.response.ChatRoomResponse;
@@ -54,15 +55,22 @@ public class ChatController {
     }
 
     @PostMapping
-    public ResponseEntity<ChatRoomResponse> addChatRoomAndUsers(@RequestParam Long userId,
-                                                                @RequestBody AddChatRoomRequest request) {
-        ChatRoomResponse room = chatService.addChatRoom(userId, request);
+    public ResponseEntity<ChatRoomResponse> createChatRoom(@RequestParam Long userId,
+                                                           @RequestBody AddChatRoomRequest request) {
+        ChatRoomResponse room = chatService.createChatRoom(userId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(room);
     }
 
     @GetMapping("/users")
     public ResponseEntity<List<UserResponse>> getUsersExceptMe(@RequestParam Long userId) {
         List<UserResponse> users = chatService.getUsersExceptMe(userId);
+        return ResponseEntity.ok(users);
+    }
+
+    @GetMapping("/users/add")
+    public ResponseEntity<List<UserResponse>> getUsersExceptExistingMembers(@RequestParam Long roomId,
+                                                                            @RequestParam Long userId) {
+        List<UserResponse> users = chatService.getUsersExceptExistingMembers(roomId, userId);
         return ResponseEntity.ok(users);
     }
 
@@ -74,11 +82,11 @@ public class ChatController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/{roomId}/user/{addUserId}")
-    public ResponseEntity<ChatRoomMemberResponse> addChatRoomUser(@PathVariable Long roomId,
-                                                                  @PathVariable Long addUserId,
-                                                                  @RequestParam Long userId) {
-        ChatRoomMemberResponse chatRoomMemberResponse = chatService.addChatRoomUser(roomId, addUserId, userId);
-        return ResponseEntity.status(HttpStatus.CREATED).body(chatRoomMemberResponse);
+    @PostMapping("/{roomId}/users")
+    public ResponseEntity<List<ChatRoomMemberResponse>> addChatRoomUsers(@PathVariable Long roomId,
+                                                                         @RequestBody AddMemberRequest request,
+                                                                         @RequestParam Long userId) {
+        List<ChatRoomMemberResponse> responses = chatService.addChatRoomUsers(roomId, request, userId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(responses);
     }
 }

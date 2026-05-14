@@ -103,6 +103,7 @@
   <ChatRoomDetail
     v-show="showChatRoomDetailModal"
     :chat-room="currentChatRoom"
+    @created="handleAddMember"
     @close="showChatRoomDetailModal = false"
   ></ChatRoomDetail>
 </template>
@@ -239,6 +240,11 @@ const handleCreated = (roomId) => {
 
 const openChatRoomDetailModal = () => {
   showChatRoomDetailModal.value = true;
+};
+
+const handleAddMember = () => {
+  showChatRoomDetailModal.value = false;
+  loadMessages(currentChatRoom.value.roomId);
 };
 
 let stompClient = null;
