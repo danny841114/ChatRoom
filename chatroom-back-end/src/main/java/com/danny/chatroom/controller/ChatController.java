@@ -1,5 +1,6 @@
 package com.danny.chatroom.controller;
 
+import com.danny.chatroom.dto.UserDetailsImpl;
 import com.danny.chatroom.dto.request.AddChatRoomRequest;
 import com.danny.chatroom.dto.request.AddMemberRequest;
 import com.danny.chatroom.dto.response.ChatMessageResponse;
@@ -10,6 +11,8 @@ import com.danny.chatroom.service.ChatService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,15 +24,15 @@ public class ChatController {
     private final ChatService chatService;
 
     @GetMapping
-    public ResponseEntity<List<ChatRoomResponse>> getMyRooms(@RequestParam Long userId) {
-        List<ChatRoomResponse> rooms = chatService.getMyRooms(userId);
+    public ResponseEntity<List<ChatRoomResponse>> getMyRooms(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        List<ChatRoomResponse> rooms = chatService.getMyRooms(userDetails.getId());
         return ResponseEntity.ok(rooms);
     }
 
     @GetMapping("/{roomId}")
     public ResponseEntity<ChatRoomResponse> getRoom(@PathVariable Long roomId,
-                                                    @RequestParam Long userId) {
-        ChatRoomResponse room = chatService.getRoom(roomId, userId);
+                                                    @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        ChatRoomResponse room = chatService.getRoom(roomId, userDetails.getId());
         return ResponseEntity.ok(room);
     }
 

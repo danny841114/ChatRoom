@@ -1,43 +1,100 @@
 package com.danny.chatroom.jwt;
 
+import com.danny.chatroom.service.AuthService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.lang.NonNull;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import io.jsonwebtoken.Claims;
 
 import java.io.IOException;
 
+@Slf4j
 @RequiredArgsConstructor
+@Component
 public class JwtFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
+    private final AuthService authService;
+
+//    @Override
+//    protected void doFilterInternal(HttpServletRequest request,
+//                                    HttpServletResponse response,
+//                                    FilterChain filterChain)
+//            throws ServletException, IOException {
+//
+//        String authHeader = request.getHeader("Authorization");
+//
+//        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+//
+//            String token = authHeader.substring(7);
+//
+//            try {
+//                Claims claims = jwtUtil.validateToken(token);
+//                String account = claims.get("account", String.class);
+//                request.setAttribute("account", account);
+//            } catch (Exception e) {
+//                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+//                response.getWriter().write("Invalid JWT");
+//                return;
+//            }
+//        }
+//
+//        filterChain.doFilter(request, response);
+//    }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain)
-            throws ServletException, IOException {
+    protected void doFilterInternal(@NonNull HttpServletRequest request,
+                                    @NonNull HttpServletResponse response,
+                                    @NonNull FilterChain filterChain) throws ServletException, IOException {
 
-        String authHeader = request.getHeader("Authorization");
+        try {
+            String token = resolveToken(request);
 
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-
-            String token = authHeader.substring(7);
-
-            try {
+            if (token != null
+                    && jwtUtil.validateToken(token) != null
+                    && SecurityContextHolder.getContext().getAuthentication() == null) {
                 Claims claims = jwtUtil.validateToken(token);
-                String account = claims.get("account", String.class);
-                request.setAttribute("account", account);
-            } catch (Exception e) {
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.getWriter().write("Invalid JWT");
-                return;
+                UserDetails userDetails = authService.loadUserByUsername(claims.getSubject());
+
+                var authentication = new UsernamePasswordAuthenticationToken(userDetails, null, null);
+                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+                log.debug("Authenticated user: {}, setting SecurityContext", userDetails);
+            }
+        } catch (Exception e) {
+            SecurityContextHolder.clearContext();
+            log.error("Could not set user authentication in security context", e);
+        }
+
+        filterChain.doFilter(request, response); // 執行過濾鏈
+    }
+
+    private String resolveToken(HttpServletRequest request) {
+        String bearerToken = request.getHeader("Authorization");
+        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7);
+        }
+
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("jwt".equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
             }
         }
 
-        filterChain.doFilter(request, response);
+        return null;
     }
 }

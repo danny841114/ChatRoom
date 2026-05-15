@@ -7,7 +7,6 @@ import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
-import java.util.Map;
 
 @Component
 public class JwtUtil {
@@ -23,7 +22,6 @@ public class JwtUtil {
                 .setSubject(account)
                 .setIssuedAt(issuedTime)
                 .setExpiration(expirationTime)
-                .addClaims(Map.of("account", account))
                 .signWith(SECRET_KEY)
                 .compact();
     }

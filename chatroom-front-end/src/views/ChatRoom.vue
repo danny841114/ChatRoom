@@ -142,10 +142,7 @@ const isChatRoomIdEmpty = computed(() => {
 const loadChatRooms = async () => {
   try {
     const response = await axios.get(`${apiBase}/api/chat/rooms`, {
-      params: { userId: authStore.userId },
-      headers: {
-        Authorization: `Bearer ${authStore.token}`,
-      },
+      withCredentials: true,
     });
 
     chatRooms.value = response.data;
@@ -178,7 +175,7 @@ const loadMessages = async (roomId) => {
         headers: {
           Authorization: `Bearer ${authStore.token}`,
         },
-      },
+      }
     );
 
     messages.value = response2.data;
@@ -216,7 +213,7 @@ const recallMessage = async (msgId) => {
         headers: {
           Authorization: `Bearer ${authStore.token}`,
         },
-      },
+      }
     );
 
     const msg = messages.value.find((m) => m.messageId === msgId);
@@ -283,7 +280,7 @@ const subscribeRoom = (roomId) => {
     (messageBody) => {
       const newMessage = JSON.parse(messageBody.body);
       messages.value.push(newMessage);
-    },
+    }
   );
 };
 
@@ -295,7 +292,7 @@ const subscribeRoomList = () => {
     (messageBody) => {
       const updatedRooms = JSON.parse(messageBody.body);
       chatRooms.value = updatedRooms;
-    },
+    }
   );
 };
 
