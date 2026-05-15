@@ -74,9 +74,10 @@ watch(
 
 const loadUsers = async () => {
   try {
-    const response = await axios.get(`${apiBase}/api/chat/rooms/users`, {
-      withCredentials: true,
-    });
+    const response = await axios.get(
+      `${apiBase}/api/chat/rooms/available-users`,
+      { withCredentials: true }
+    );
 
     users.value = response.data;
   } catch (e) {

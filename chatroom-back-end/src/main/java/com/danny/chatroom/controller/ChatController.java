@@ -24,7 +24,7 @@ public class ChatController {
     private final ChatService chatService;
 
     @GetMapping
-    public ResponseEntity<List<ChatRoomResponse>> getMyRooms(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public ResponseEntity<List<ChatRoomResponse>> getRooms(@AuthenticationPrincipal UserDetailsImpl userDetails) {
         List<ChatRoomResponse> rooms = chatService.getMyRooms(userDetails.getId());
         return ResponseEntity.ok(rooms);
     }
@@ -62,20 +62,20 @@ public class ChatController {
         return ResponseEntity.status(HttpStatus.CREATED).body(room);
     }
 
-    @GetMapping("/users")
+    @GetMapping("/available-users")
     public ResponseEntity<List<UserResponse>> getUsersExceptMe(@AuthenticationPrincipal UserDetailsImpl userDetails) {
         List<UserResponse> users = chatService.getUsersExceptMe(userDetails.getId());
         return ResponseEntity.ok(users);
     }
 
-    @GetMapping("/users/add")
-    public ResponseEntity<List<UserResponse>> getUsersExceptExistingMembers(@RequestParam Long roomId,
-                                                                            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    @GetMapping("/{roomId}/available-users")
+    public ResponseEntity<List<UserResponse>> getUsersExceptExisting(@PathVariable Long roomId,
+                                                                     @AuthenticationPrincipal UserDetailsImpl userDetails) {
         List<UserResponse> users = chatService.getUsersExceptExistingMembers(roomId, userDetails.getId());
         return ResponseEntity.ok(users);
     }
 
-    @DeleteMapping("/{roomId}/user/{deleteUserId}")
+    @DeleteMapping("/{roomId}/users/{deleteUserId}")
     public ResponseEntity<Void> deleteChatRoomUser(@PathVariable Long roomId,
                                                    @PathVariable Long deleteUserId,
                                                    @AuthenticationPrincipal UserDetailsImpl userDetails) {
