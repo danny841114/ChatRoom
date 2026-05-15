@@ -4,6 +4,8 @@ import com.danny.chatroom.dto.UserDetailsImpl;
 import com.danny.chatroom.dto.request.LoginRequest;
 import com.danny.chatroom.jwt.JwtUtil;
 import com.danny.chatroom.service.AuthService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -13,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -68,5 +71,32 @@ public class AuthController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
         }
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logoutApi(HttpServletResponse response) {
+        ResponseCookie cookie = ResponseCookie.from("jwt", "")
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .maxAge(0)
+                .sameSite("Lax")
+                .build();
+
+        return ResponseEntity.noContent()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .build();
+    }
+
+    @GetMapping("/fetchMe")
+    public ResponseEntity<?> fetchMe(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        if (userDetails == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("account", userDetails.getAccount());
+        response.put("username", userDetails.getUsername());
+        response.put("userId", userDetails.getId());
+
+        return ResponseEntity.ok(response);
     }
 }

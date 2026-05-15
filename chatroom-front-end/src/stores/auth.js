@@ -17,22 +17,30 @@ export const useAuthStore = defineStore("auth", {
       this.userId = data.userId;
     },
 
-    logout() {
+    async logout() {
       this.account = null;
       this.username = null;
       this.userId = null;
+
+      try {
+        const response = await axios.post(`${apiBase}/api/auth/logout`, null, {
+          withCredentials: true,
+        });
+      } catch (e) {
+        console.error("Error log out", e);
+      }
     },
 
-    // async fetchMe() {
-    //   try {
-    //     const response = await axios.get(`${apiBase}/api/me`, {
-    //       withCredentials: true,
-    //     });
+    async fetchMe() {
+      try {
+        const response = await axios.get(`${apiBase}/api/auth/fetchMe`, {
+          withCredentials: true,
+        });
 
-    //     this.setLogin(response.data);
-    //   } catch (e) {
-    //     this.logout();
-    //   }
-    // },
+        this.setLogin(response.data);
+      } catch (e) {
+        console.error("Error fetch me", e);
+      }
+    },
   },
 });
