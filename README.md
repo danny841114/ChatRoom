@@ -5,6 +5,7 @@
 ## Tech Stack
 
 ### Backend
+
 - Java 17
 - Spring Boot
 - Spring Security
@@ -14,6 +15,7 @@
 - H2 Database
 
 ### Frontend
+
 - Vue 3
 - Pinia
 - Axios
@@ -38,16 +40,19 @@
 ## WebSocket Topics
 
 ### Send Message
+
 ```txt
 /app/chat.sendMessage/{roomId}
 ```
 
 ### Subscribe Room Messages
+
 ```txt
 /topic/rooms/{roomId}
 ```
 
 ### Subscribe User Room List
+
 ```txt
 /topic/users/{userId}/rooms
 ```
@@ -71,11 +76,13 @@ H2 Database
 ## Run Project
 
 ### Backend
+
 ```bash
 ./mvnw spring-boot:run
 ```
 
 ### Frontend
+
 ```bash
 npm install
 npm run dev

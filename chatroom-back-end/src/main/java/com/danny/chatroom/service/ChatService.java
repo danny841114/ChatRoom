@@ -25,6 +25,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
+@Transactional
 @Service
 public class ChatService {
     private final ChatRoomMemberRepository chatRoomMemberRepository;
@@ -124,7 +125,6 @@ public class ChatService {
         chatMessageRepository.save(chatMessage);
     }
 
-    @Transactional
     public ChatMessageResponse sendMessage(Long roomId, SendMessageRequest request) {
         Long senderId = request.getSenderId();
 
