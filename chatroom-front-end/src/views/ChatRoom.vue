@@ -141,7 +141,7 @@ const isChatRoomIdEmpty = computed(() => {
 
 const loadChatRooms = async () => {
   try {
-    const response = await axios.get(`${apiBase}/api/chat/rooms`, {
+    const response = await axios.get(`${apiBase}/api/chat-rooms`, {
       withCredentials: true,
     });
 
@@ -155,7 +155,7 @@ const loadMessages = async (roomId) => {
   openedMenuId.value = null;
 
   try {
-    const response = await axios.get(`${apiBase}/api/chat/rooms/${roomId}`, {
+    const response = await axios.get(`${apiBase}/api/chat-rooms/${roomId}`, {
       withCredentials: true,
     });
 
@@ -166,7 +166,7 @@ const loadMessages = async (roomId) => {
 
   try {
     const response2 = await axios.get(
-      `${apiBase}/api/chat/rooms/${roomId}/messages`,
+      `${apiBase}/api/chat-rooms/${roomId}/messages`,
       { withCredentials: true }
     );
 
@@ -196,7 +196,7 @@ const toggleMenu = (messageId) => {
 const recallMessage = async (msgId) => {
   try {
     await axios.delete(
-      `${apiBase}/api/chat/rooms/${currentChatRoom.value.roomId}/messages/${msgId}`,
+      `${apiBase}/api/chat-rooms/${currentChatRoom.value.roomId}/messages/${msgId}`,
       { withCredentials: true }
     );
 

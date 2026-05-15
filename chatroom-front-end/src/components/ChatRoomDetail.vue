@@ -86,7 +86,7 @@ const deleteMember = async (userId, username, account) => {
 
   try {
     const response = await axios.delete(
-      `${apiBase}/api/chat/rooms/${props.chatRoom.roomId}/users/${userId}`,
+      `${apiBase}/api/chat-rooms/${props.chatRoom.roomId}/users/${userId}`,
       {
         withCredentials: true,
       }
@@ -105,7 +105,7 @@ const deleteMember = async (userId, username, account) => {
 const getUsersExceptExistingMembers = async () => {
   try {
     const response = await axios.get(
-      `${apiBase}/api/chat/rooms/${props.chatRoom.roomId}/available-users`,
+      `${apiBase}/api/chat-rooms/${props.chatRoom.roomId}/available-users`,
       { withCredentials: true }
     );
 
@@ -118,7 +118,7 @@ const getUsersExceptExistingMembers = async () => {
 const addChatRoomMember = async () => {
   try {
     const response = await axios.post(
-      `${apiBase}/api/chat/rooms/${props.chatRoom.roomId}/users`,
+      `${apiBase}/api/chat-rooms/${props.chatRoom.roomId}/users`,
       { userIds: selectedUserIds.value },
       { withCredentials: true }
     );

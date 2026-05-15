@@ -75,7 +75,7 @@ watch(
 const loadUsers = async () => {
   try {
     const response = await axios.get(
-      `${apiBase}/api/chat/rooms/available-users`,
+      `${apiBase}/api/chat-rooms/available-users`,
       { withCredentials: true }
     );
 
@@ -100,7 +100,7 @@ const createRoom = async () => {
     }
 
     const response = await axios.post(
-      `${apiBase}/api/chat/rooms`,
+      `${apiBase}/api/chat-rooms`,
       {
         name: roomName.value,
         type: roomType.value,
