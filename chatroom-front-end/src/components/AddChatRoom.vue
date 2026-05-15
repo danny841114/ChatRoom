@@ -32,7 +32,7 @@
 
         <select
           class="form-control"
-          v-model="selectedPrivateUserIds"
+          v-model="selectedGroupUserIds"
           v-if="roomType === 'GROUP'"
           multiple
         >
@@ -52,31 +52,30 @@
 
 <script setup>
 import { ref, onMounted, watch } from "vue";
-import { useAuthStore } from "@/stores/auth";
 import axios from "axios";
+import Swal from "sweetalert2";
 
 const apiBase = import.meta.env.VITE_API_BASE_URL;
 const emit = defineEmits(["close", "created"]);
-const authStore = useAuthStore();
 const users = ref([]);
 
 const roomName = ref(null);
 const roomType = ref("PRIVATE");
 const selectedPrivateUserId = ref(null);
-const selectedPrivateUserIds = ref([]);
+const selectedGroupUserIds = ref([]);
 
 watch(
   () => roomType.value,
   (currentType) => {
     if (currentType === "PRIVATE") roomName.value = null;
-  }
+  },
 );
 
 const loadUsers = async () => {
   try {
     const response = await axios.get(
       `${apiBase}/api/chat-rooms/available-users`,
-      { withCredentials: true }
+      { withCredentials: true },
     );
 
     users.value = response.data;
@@ -88,7 +87,14 @@ const loadUsers = async () => {
 const createRoom = async () => {
   try {
     if (roomType.value === "GROUP" && roomName.value === null) {
-      console.log("Type 'GROUP' but name null");
+      await Swal.fire({
+        title: "名稱不得為空",
+        icon: "warning",
+        allowOutsideClick: false,
+        showCancelButton: false,
+        confirmButtonText: "確認",
+      });
+
       return;
     }
 
@@ -96,7 +102,7 @@ const createRoom = async () => {
     if (roomType.value === "PRIVATE") {
       memberIds = [selectedPrivateUserId.value];
     } else {
-      memberIds = selectedPrivateUserIds.value;
+      memberIds = selectedGroupUserIds.value;
     }
 
     const response = await axios.post(
@@ -108,11 +114,11 @@ const createRoom = async () => {
       },
       {
         withCredentials: true,
-      }
+      },
     );
 
     roomName.value = null;
-    selectedPrivateUserIds.value = [];
+    selectedGroupUserIds.value = [];
 
     emit("created", response.data.roomId);
   } catch (e) {

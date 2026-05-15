@@ -58,13 +58,11 @@
 
 <script setup>
 import { ref } from "vue";
-import { useAuthStore } from "@/stores/auth";
 import axios from "axios";
 import Swal from "sweetalert2";
 
 const apiBase = import.meta.env.VITE_API_BASE_URL;
 const emit = defineEmits(["close", "created"]);
-const authStore = useAuthStore();
 const props = defineProps({
   chatRoom: Object,
 });
@@ -89,7 +87,7 @@ const deleteMember = async (userId, username, account) => {
       `${apiBase}/api/chat-rooms/${props.chatRoom.roomId}/users/${userId}`,
       {
         withCredentials: true,
-      }
+      },
     );
 
     if (response.status === 204) {
@@ -106,7 +104,7 @@ const getUsersExceptExistingMembers = async () => {
   try {
     const response = await axios.get(
       `${apiBase}/api/chat-rooms/${props.chatRoom.roomId}/available-users`,
-      { withCredentials: true }
+      { withCredentials: true },
     );
 
     usersForAdding.value = response.data;
@@ -120,7 +118,7 @@ const addChatRoomMember = async () => {
     const response = await axios.post(
       `${apiBase}/api/chat-rooms/${props.chatRoom.roomId}/users`,
       { userIds: selectedUserIds.value },
-      { withCredentials: true }
+      { withCredentials: true },
     );
 
     selectedUserIds.value = [];
