@@ -24,9 +24,10 @@ public class ChatWebSocketController {
         ChatMessageResponse savedMessage = chatService.sendMessage(roomId, request);
         messagingTemplate.convertAndSend("/topic/rooms/" + roomId, savedMessage);
 
+        // 有在此間聊天室的使用者都需要被推播新的聊天室清單(排序改變)
         List<ChatRoomMember> chatRoomMembers = chatService.findByChatRoomId(roomId);
-        for (ChatRoomMember member : chatRoomMembers) {
-            Long memberId = member.getUser().getId();
+        for (ChatRoomMember chatRoomMember : chatRoomMembers) {
+            Long memberId = chatRoomMember.getUser().getId();
             List<ChatRoomResponse> myRooms = chatService.getMyRooms(memberId);
             messagingTemplate.convertAndSend("/topic/users/" + memberId + "/rooms", myRooms);
         }

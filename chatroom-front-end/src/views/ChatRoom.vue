@@ -274,8 +274,7 @@ const subscribeRoomList = () => {
   roomListSubscription = stompClient.subscribe(
     `/topic/users/${authStore.userId}/rooms`,
     (messageBody) => {
-      const updatedRooms = JSON.parse(messageBody.body);
-      chatRooms.value = updatedRooms;
+      chatRooms.value = JSON.parse(messageBody.body);
     }
   );
 };
