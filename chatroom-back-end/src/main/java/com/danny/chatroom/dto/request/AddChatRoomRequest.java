@@ -11,6 +11,6 @@ import java.util.Set;
 @AllArgsConstructor
 public class AddChatRoomRequest {
     private String name;
-    private String type; // PRIVATE / GROUP
+    private String type;
     private Set<Long> memberIds;
 }

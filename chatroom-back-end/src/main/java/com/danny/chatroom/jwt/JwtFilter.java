@@ -80,6 +80,7 @@ public class JwtFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response); // 執行過濾鏈
     }
 
+    // TODO: Get token only from cookies
     private String resolveToken(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {

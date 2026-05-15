@@ -156,10 +156,7 @@ const loadMessages = async (roomId) => {
 
   try {
     const response = await axios.get(`${apiBase}/api/chat/rooms/${roomId}`, {
-      params: { userId: authStore.userId },
-      headers: {
-        Authorization: `Bearer ${authStore.token}`,
-      },
+      withCredentials: true,
     });
 
     currentChatRoom.value = response.data;
@@ -170,12 +167,7 @@ const loadMessages = async (roomId) => {
   try {
     const response2 = await axios.get(
       `${apiBase}/api/chat/rooms/${roomId}/messages`,
-      {
-        params: { userId: authStore.userId },
-        headers: {
-          Authorization: `Bearer ${authStore.token}`,
-        },
-      }
+      { withCredentials: true }
     );
 
     messages.value = response2.data;
@@ -204,16 +196,8 @@ const toggleMenu = (messageId) => {
 const recallMessage = async (msgId) => {
   try {
     await axios.delete(
-      `${apiBase}/api/chat/rooms/${currentChatRoom.value.roomId}/messages`,
-      {
-        params: {
-          messageId: msgId,
-          userId: authStore.userId,
-        },
-        headers: {
-          Authorization: `Bearer ${authStore.token}`,
-        },
-      }
+      `${apiBase}/api/chat/rooms/${currentChatRoom.value.roomId}/messages/${msgId}`,
+      { withCredentials: true }
     );
 
     const msg = messages.value.find((m) => m.messageId === msgId);

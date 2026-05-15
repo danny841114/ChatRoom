@@ -69,13 +69,13 @@ watch(
   () => roomType.value,
   (currentType) => {
     if (currentType === "PRIVATE") roomName.value = null;
-  },
+  }
 );
 
 const loadUsers = async () => {
   try {
     const response = await axios.get(`${apiBase}/api/chat/rooms/users`, {
-      params: { userId: authStore.userId },
+      withCredentials: true,
     });
 
     users.value = response.data;
@@ -106,8 +106,8 @@ const createRoom = async () => {
         memberIds: memberIds,
       },
       {
-        params: { userId: authStore.userId },
-      },
+        withCredentials: true,
+      }
     );
 
     roomName.value = null;

@@ -37,20 +37,18 @@ public class ChatController {
     }
 
     @GetMapping("/{roomId}/messages")
-    public ResponseEntity<List<ChatMessageResponse>> getMessages(
-            @PathVariable Long roomId,
-            @RequestParam Long userId) {
-        List<ChatMessageResponse> messages = chatService.getMessages(roomId, userId);
+    public ResponseEntity<List<ChatMessageResponse>> getMessages(@PathVariable Long roomId,
+                                                                 @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        List<ChatMessageResponse> messages = chatService.getMessages(roomId, userDetails.getId());
         return ResponseEntity.ok(messages);
     }
 
-    @DeleteMapping("/{roomId}/messages")
-    public ResponseEntity<?> deleteMessage(
-            @PathVariable Long roomId,
-            @RequestParam Long messageId,
-            @RequestParam Long userId) {
+    @DeleteMapping("/{roomId}/messages/{messageId}")
+    public ResponseEntity<?> deleteMessage(@PathVariable Long roomId,
+                                           @PathVariable Long messageId,
+                                           @AuthenticationPrincipal UserDetailsImpl userDetails) {
         try {
-            chatService.deleteMessage(roomId, messageId, userId);
+            chatService.deleteMessage(roomId, messageId, userDetails.getId());
             return ResponseEntity.noContent().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
@@ -58,38 +56,38 @@ public class ChatController {
     }
 
     @PostMapping
-    public ResponseEntity<ChatRoomResponse> createChatRoom(@RequestParam Long userId,
-                                                           @RequestBody AddChatRoomRequest request) {
-        ChatRoomResponse room = chatService.createChatRoom(userId, request);
+    public ResponseEntity<ChatRoomResponse> createChatRoom(@RequestBody AddChatRoomRequest request,
+                                                           @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        ChatRoomResponse room = chatService.createChatRoom(request, userDetails.getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(room);
     }
 
     @GetMapping("/users")
-    public ResponseEntity<List<UserResponse>> getUsersExceptMe(@RequestParam Long userId) {
-        List<UserResponse> users = chatService.getUsersExceptMe(userId);
+    public ResponseEntity<List<UserResponse>> getUsersExceptMe(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        List<UserResponse> users = chatService.getUsersExceptMe(userDetails.getId());
         return ResponseEntity.ok(users);
     }
 
     @GetMapping("/users/add")
     public ResponseEntity<List<UserResponse>> getUsersExceptExistingMembers(@RequestParam Long roomId,
-                                                                            @RequestParam Long userId) {
-        List<UserResponse> users = chatService.getUsersExceptExistingMembers(roomId, userId);
+                                                                            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        List<UserResponse> users = chatService.getUsersExceptExistingMembers(roomId, userDetails.getId());
         return ResponseEntity.ok(users);
     }
 
     @DeleteMapping("/{roomId}/user/{deleteUserId}")
     public ResponseEntity<Void> deleteChatRoomUser(@PathVariable Long roomId,
                                                    @PathVariable Long deleteUserId,
-                                                   @RequestParam Long userId) {
-        chatService.deleteChatRoomUser(roomId, deleteUserId, userId);
+                                                   @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        chatService.deleteChatRoomUser(roomId, deleteUserId, userDetails.getId());
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/{roomId}/users")
     public ResponseEntity<List<ChatRoomMemberResponse>> addChatRoomUsers(@PathVariable Long roomId,
                                                                          @RequestBody AddMemberRequest request,
-                                                                         @RequestParam Long userId) {
-        List<ChatRoomMemberResponse> responses = chatService.addChatRoomUsers(roomId, request, userId);
+                                                                         @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        List<ChatRoomMemberResponse> responses = chatService.addChatRoomUsers(roomId, request, userDetails.getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(responses);
     }
 }

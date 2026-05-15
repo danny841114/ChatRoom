@@ -156,8 +156,7 @@ public class ChatService {
         return chatRoomMemberRepository.findByChatRoomId(roomId);
     }
 
-    public ChatRoomResponse createChatRoom(Long userId,
-                                           AddChatRoomRequest addChatRoomRequest) {
+    public ChatRoomResponse createChatRoom(AddChatRoomRequest addChatRoomRequest, Long userId) {
         Set<Long> memberIds = addChatRoomRequest.getMemberIds();
         String type = addChatRoomRequest.getType();
 
